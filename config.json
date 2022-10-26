@@ -1,0 +1,13 @@
+{
+  "input_file": "/store/EQUIPES/SSFA/antoine.laine/General_Annot_Tool/data/top-contig-counts-pearson.tsv.gz",
+  "sequence_col": "contig",
+  "id_col": "tag",
+  "map_to" : ["human"],
+  "human_index" : "/store/EQUIPES/SSFA/antoine.laine/General_Annot_Tool/human_index",
+  "supp_map_to":["RDP"],
+  "RDP_fasta" : "/store/EQUIPES/SSFA/antoine.laine/General_Annot_Tool/bacteria_index/RDP.fasta",
+  "output_dir": "/store/EQUIPES/SSFA/antoine.laine/General_Annot_Tool/results",
+  "keep_col": ["contig","nb-merged-kmer","rep-value","tag"],
+  "threads": 4,
+  "library_type": "unstranded"
+}
