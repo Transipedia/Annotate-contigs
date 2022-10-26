@@ -13,9 +13,10 @@ This tool was initially thought as a less restrictive alternative to [DEkupl-ann
 
 ## Usage
 
--   In order to run the tool, you will need 2 specific files :
-    -   Input file : A tsv/csv file with at least 2 named columns. One contains the sequences you want to annotate, and each sequence must have a unique identifier. Typical input files are Dekupl-run/Kamrat outputs (exemple available in toy/input/).
+-   In order to run the tool, you will need at least 4 specific files (more if you intend to use multiple organisms):
+    -   Input file : A tsv/csv file with at least 2 named columns. One contains the sequences you want to annotate, and each sequence must have a unique identifier. Typical input files are Dekupl-run/Kamrat outputs (example available in toy/input/).
     -   Config file : As the pipeline is designed with snakemake, any run requires a cinfiguration file. See below for specifications of available parameters.
+    -   Genome and annotation files : Associated fasta and gtf files of an organism (gz). Typically downloaded from [Ensembl](https://www.ensembl.org/index.html) or [Gencode](https://www.gencodegenes.org/) websites.(examples available in toy/references)
 
 ## Installation
 
@@ -80,7 +81,7 @@ Your `config.json` should be the only file you have to interact with in order to
 - **input_file**: Path to the file containing sequences to annotate. (TSV/CSV, gz or not)
 - **map_to**: A list of species/organism on which the tool will try to map your sequences. Mapping is sequential and substractive, meaning if a sequence is mapped on the first organism of the list, we won't try to map it on the second, etc...
 
-- EITHER **[organism]_fasta & [organism]_gff** : Links to fasta.gz and gtf.gz* (respectively) used to build the index of said organism, if it's the first time you use the tool with this organism. Exemples of such links for a human genome annotation are available in the config.json file.
+- EITHER **[organism]_fasta & [organism]_gff** : Paths to fasta.gz and gtf.gz* (respectively) used to build the index of said organism, if it's the first time you use the tool with this organism. Exemples of such files for a human genome annotation are available in toy/references.
 - OR **[organism]_index**: Path to built index of said organism, if you already used the tool once with this organism.
 
 

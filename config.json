@@ -1,13 +1,13 @@
 {
-  "input_file": "/home/user/Annotate-contigs/toy/input/dekupl-run_output.tsv.gz",
+  "input_file": "/home/antoine.laine/Documents/Annotate-contigs/toy/input/dekupl-run_output.tsv.gz",
   "sequence_col": "contig",
   "id_col": "tag",
   "map_to" : ["human"],
-  "human_fasta" : "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/GRCh38.primary_assembly.genome.fa.gz",
-  "human_gff" : "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.primary_assembly.annotation.gtf.gz",
+  "human_fasta" : "/home/antoine.laine/Documents/Annotate-contigs/toy/references/part-GRCh38.primary_assembly.genome.fa.gz",
+  "human_gff" : "/home/antoine.laine/Documents/Annotate-contigs/toy/references/part-gencode.v42.primary_assembly.annotation.gtf.gz",
   "supp_map_to":["HumanRepeats"],
-  "HumanRepeats_fasta" : "/home/user/Annotate-contigs/toy/references/human_repeat_ref.fasta",
-  "output_dir": "/home/user/results",
+  "HumanRepeats_fasta" : "/home/antoine.laine/Documents/Annotate-contigs/toy/references/human_repeat_ref.fasta",
+  "output_dir": "/home/antoine.laine/Documents/Annotate-contigs/results",
   "keep_col": ["contig","nb-merged-kmer","tag"],
   "threads": 4,
   "library_type": "unstranded"

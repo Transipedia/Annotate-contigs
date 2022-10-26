@@ -94,24 +94,27 @@ def select_unmapped(ref,output_dir):
     return output_dir + "/STAR_" + ref + "/Unmapped.out.mate1"
 ### ========== Rules ========== ###
 
-rule all:
-    input: OUTPUT_DIR + "/query.fa.gz"
-
 #rule all:
-#    input: OUTPUT_DIR + "/merged_annotation.tsv"
+#    input: OUTPUT_DIR + "/human_tmp/reference.fa"
+
+rule all:
+    input: OUTPUT_DIR + "/merged_annotation.tsv"
 
 BUILD = index_to_create(index_dict)
 INDEX = [index_dict[MAP_TO[i]][1] for i in range(len(MAP_TO))]
 
 if BUILD:
-    rule download_reference:
+    rule organize_reference:
+        input:
+            fasta = [index_dict[ref][2] for ref in BUILD],
+            gff = [index_dict[ref][3] for ref in BUILD]
         output:
             fasta = expand("{ref}_index/reference.fa.gz",ref=BUILD),
             gff = expand("{ref}_index/annotation.gtf.gz",ref=BUILD)
         run:
-            for i in range(len(BUILD)):
-                shell("wget {link} -O {output_file}".format(link=index_dict[BUILD[i]][2],output_file=output.fasta[i]))
-                shell("wget {link} -O {output_file}".format(link=index_dict[BUILD[i]][3],output_file=output.gff[i]))
+            for i in range(len(MAP_TO)):
+                shell("cp {fasta} {cp_fasta}".format(fasta=input.fasta[i],cp_fasta=output.fasta[i]))
+                shell("cp {gff} {cp_gff}".format(gff=input.gff[i],cp_gff=output.gff[i]))
 
 rule copy_reference:
     input:
