@@ -14,7 +14,7 @@ This tool was initially thought as a less restrictive alternative to [DEkupl-ann
 ## Usage
 
 -   In order to run the tool, you will need 2 specific files :
-    -   Input file : A tsv/csv file with at least 2 named columns. One contains the sequences you want to annotate, and each sequence must have a unique identifier. Typical input files are Dekupl-run/Kamrat outputs.
+    -   Input file : A tsv/csv file with at least 2 named columns. One contains the sequences you want to annotate, and each sequence must have a unique identifier. Typical input files are Dekupl-run/Kamrat outputs (exemple available in toy/input/).
     -   Config file : As the pipeline is designed with snakemake, any run requires a cinfiguration file. See below for specifications of available parameters.
 
 ## Installation
