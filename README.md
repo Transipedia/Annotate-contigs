@@ -13,10 +13,9 @@ This tool was initially thought as a less restrictive alternative to [DEkupl-ann
 
 ## Usage
 
--   In order to run the tool, you will need at least 4 specific files (more if you intend to use multiple organisms):
+-   In order to run the tool, you will need 2 specific files :
     -   Input file : A tsv/csv file with at least 2 named columns. One contains the sequences you want to annotate, and each sequence must have a unique identifier. Typical input files are Dekupl-run/Kamrat outputs.
     -   Config file : As the pipeline is designed with snakemake, any run requires a cinfiguration file. See below for specifications of available parameters.
-    -   Genome and annotation files : Associated fasta and gtf files of an organism, gz.
 
 ## Installation
 
@@ -81,7 +80,7 @@ Your `config.json` should be the only file you have to interact with in order to
 - **input_file**: Path to the file containing sequences to annotate. (TSV/CSV, gz or not)
 - **map_to**: A list of species/organism on which the tool will try to map your sequences. Mapping is sequential and substractive, meaning if a sequence is mapped on the first organism of the list, we won't try to map it on the second, etc...
 
-- EITHER **[organism]_fasta & [organism]_gff** : Links to fasta.gz and gtf.gz* (respectively) used to build the index of said organism, if it's the first time you use the tool with this organism
+- EITHER **[organism]_fasta & [organism]_gff** : Links to fasta.gz and gtf.gz* (respectively) used to build the index of said organism, if it's the first time you use the tool with this organism. Exemples of such links for a human genome annotation are available in the config.json file.
 - OR **[organism]_index**: Path to built index of said organism, if you already used the tool once with this organism.
 
 
@@ -95,15 +94,8 @@ In the way it's designed, only the "exon" features of the GTF file will be used 
 - **keep_col**: (Default:"all"). Either "all" or a list of column names you want to keep from the input file.
 - **library_type**: (Default:"rf"). Specify if your data is "stranded", "rf", "fr" or "unstranded".
 - **supp_map_to**: (Default:"None"). A list of supplementary references you want to map your sequences to, with no further informations (using blast).
-- **[reference]_fasta**: For each reference in `supp_map_to`, path to its fasta sequence.
+- **[reference]_fasta**: For each reference in `supp_map_to`, path to its fasta sequence. An exemple of a typical fasta file you could use (Human repeats from Dfam) is available in toy/references/.
 
 ## Output file
 
 - Table `merged_annotation.tsv`, summarizing for each contig, its location on the genome (if it's aligned), the sequence alignment informations, and other optionnal alignment informations.
-
-
-
-
-## Ontology
-
-WIP

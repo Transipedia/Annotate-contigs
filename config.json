@@ -1,13 +1,14 @@
 {
-  "input_file": "/store/EQUIPES/SSFA/antoine.laine/General_Annot_Tool/data/top-contig-counts-pearson.tsv.gz",
+  "input_file": "/home/user/Annotate-contigs/toy/input/dekupl-run_output.tsv.gz",
   "sequence_col": "contig",
   "id_col": "tag",
   "map_to" : ["human"],
-  "human_index" : "/store/EQUIPES/SSFA/antoine.laine/General_Annot_Tool/human_index",
-  "supp_map_to":["RDP"],
-  "RDP_fasta" : "/store/EQUIPES/SSFA/antoine.laine/General_Annot_Tool/bacteria_index/RDP.fasta",
-  "output_dir": "/store/EQUIPES/SSFA/antoine.laine/General_Annot_Tool/results",
-  "keep_col": ["contig","nb-merged-kmer","rep-value","tag"],
+  "human_fasta" : "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/GRCh38.primary_assembly.genome.fa.gz",
+  "human_gff" : "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_42/gencode.v42.primary_assembly.annotation.gtf.gz",
+  "supp_map_to":["HumanRepeats"],
+  "HumanRepeats_fasta" : "/home/user/Annotate-contigs/toy/references/human_repeat_ref.fasta",
+  "output_dir": "/home/user/results",
+  "keep_col": ["contig","nb-merged-kmer","tag"],
   "threads": 4,
   "library_type": "unstranded"
 }
