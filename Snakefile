@@ -1,6 +1,6 @@
 """
 @created: 29/09/21
-@modified: 29/09/21
+@modified: 28/10/22
 @main_dev: Antoine Laine
     I2BC(SSFA)
 
@@ -21,8 +21,6 @@ import script.loadGFF as lGFF
 import script.addGFFData as aGFFD
 import script.addCHIMData as aCD
 import script.mergeAnnot as mA
-
-configfile: "config.json"
 
 shell.executable('bash')
 
@@ -176,7 +174,7 @@ rule create_fasta:
         fasta = temp(OUTPUT_DIR + "/query.fa"),
         fasta_gz = OUTPUT_DIR + "/query.fa.gz"
     run:
-        shell("awk -f script/generate_fasta.awk c1={params.id_col} c2={params.seq_col} < {input.base_file}> {output.fasta}")
+        shell("awk -f /annot/script/generate_fasta.awk c1={params.id_col} c2={params.seq_col} < {input.base_file}> {output.fasta}")
         shell("gzip -c {output.fasta} > {output.fasta_gz}")
 
 
