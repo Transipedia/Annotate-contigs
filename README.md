@@ -66,7 +66,7 @@ Using the parameter "-B /store:/store" will indicate singularity to reference yo
 
 - **Step 2: Install the tool from Github repository**
     ```
-    git clone https://github.com/aLaine1/general-annotation && cd dekupl-annotation
+    git clone https://github.com/Transipedia/Annotate-contigs && cd Annotate-contigs
     ```
 - **Step 3: Edit config file & run with Snakemake.**    
     ```
@@ -100,3 +100,40 @@ In the way it's designed, only the "exon" features of the GTF file will be used 
 ## Output file
 
 - Table `merged_annotation.tsv`, summarizing for each contig, its location on the genome (if it's aligned), the sequence alignment informations, and other optionnal alignment informations.
+
+## Annotated values
+
+| Term       | Type        | Description         |
+| ----------------------- | ----- | ----------- |
+| mapped_to               | Str   | Reference to which the sequence was aligned                                               |
+| chromosome              | Str   | Chromosome                                                                                         |
+| start                   | Int   | Begining of the alignment on the reference                                                         |
+| end                     | Int   | End of the alignment on the reference                                                              |
+| strand                  | Char  | Strand of the alignment (+/-). set to "." in unstranded data.                                      |
+| cigar                   | Str   | CIGAR string from the SAM alignment.                                                               |
+| nb_insertion            | Int   | Number of insertions in the alignment (infered from cigar)                                                 |
+| nb_deletion             | Int   | Number of deletions in the alignment (infered from cigar)                                                  |
+| nb_splice               | Int   | Number of splices in the alignment (infered from cigar)                                                    |
+| nb_snv                  | Int   | Number of SNV in the contigs (computed as the number of mismatches minus indels)                   |
+| clipped_3p              | Int   | Number of clipped bases (soft/hard) from 3prim contig                                              |
+| clipped_5p              | Int   | Number of clipped bases (soft/hard) from 5prim contig                                              |
+| query_cover             | Float | Fraction of the query that have been aligned to the reference                                      |
+| alignment_identity      | Float | Fraction of exact match over the query alignment length (splices do not count)                     |
+| nb_hit                  | Int   | Number of alignment given for the contig (NH field)                                                |
+| nb_mismatches           | Int   | Number of mismatches in the alignment (NM field)                                                   |                         |
+| gene_id                 | Str   | Overlapping gene ID (from GTF ID field)                   |
+| gene_symbol             | Str   | Overlapping gene symbol (from GTF Name field)            |
+| gene_biotype            | Str   | Overlapping gene biotype (from GTF biotype field)        |
+| gene_strand             | Char  | Overlapping gene strand (+/-)                           |
+| as_gene_id              | Str   | Overlapping antisense gene ID (from GFF ID field). Only defined when working with stranded datas.              |
+| as_gene_symbol          | Str   | Overlapping antisense gene symbol (from GFF Name field). Only defined when working with stranded datas.        |
+| as_gene_strand          | Char  | Overlapping antisense gene strand (+/-). Only defined when working with stranded datas.                        |
+| as_gene_biotype         | Str   | Overlapping antisense gene biotype (from GFF biotype field). Only defined when working with stranded datas.    |
+| is_exonic               | Bool  | Overlap between an exon and the contig. Same strand if working with stranded datas, both strand otherwise.   |
+| is_intronic             | Bool  | Overlap between an intron and the contig. Same strand if working with stranded datas, both strand otherwise. |
+| is_chimeric             | Bool  | The contig contains a chimeric junction                                                             |
+| is_circ                 | Bool  | The chimeric junction behaves like a circular RNA.                                                        |
+| seg1_cj                 | Str   | First segment of the chimeric junction |
+| seg2_cj                 | Str   | Second segment of the chimeric junction |
+
+### An additional column will be added for each reference added to the "supp_map_to" feature
