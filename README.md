@@ -78,23 +78,22 @@ Using the parameter "-B /store:/store" will indicate singularity to reference yo
 Your `config.json` should be the only file you have to interact with in order to run the annotation.
 
 ### Mandatory parameters :
-- **input_file**: Path to the file containing sequences to annotate. (TSV/CSV, gz or not)
-- **map_to**: A list of species/organism on which the tool will try to map your sequences. Mapping is sequential and substractive, meaning if a sequence is mapped on the first organism of the list, we won't try to map it on the second, etc...
-
+- **input_file**: Path to the file containing sequences to annotate. (tsv/csv, gz or not)
+- **map_to**: A list of species/organisms on which the tool will try to map your sequences. Mapping is sequential and substractive, meaning if a sequence is mapped on the first organism of the list, we won't try to map it on the second, etc...
 - EITHER **[organism]_fasta & [organism]_gff** : Paths to fasta.gz and gtf.gz* (respectively) used to build the index of said organism, if it's the first time you use the tool with this organism. Exemples of such files for a human genome annotation are available in toy/references.
 - OR **[organism]_index**: Path to built index of said organism, if you already used the tool once with this organism.
 
 
 ### *About the GTF
-In the way it's designed, only the "exon" features of the GTF file will be used by this tool. In order for the program to annotate properly, the mandatory attributes (column 9) are : "gene_id", "transcript_id", "gene_type".
+Only the "exon" features of the GTF file will be used. In order for the program to run properly, the mandatory attributes (column 9) are : "gene_id", "transcript_id", "gene_type".
 
 ### Optionnal parameters (and default values) :
-- **sequence_col**: (Default :"contig"). Name of the column of your file containing the sequences to annotate.
-- **id_col**: (Default:"tag"). Name of the column of your file containing the unique identifier of the sequence.
+- **sequence_col**: (Default :"contig"). Name of the column in input file containing the sequences to annotate.
+- **id_col**: (Default:"tag"). Name of the column in input file containing the unique identifier of the sequence.
 - **output_dir**: (Default:"./output"). Path to where the results will be generated.
 - **keep_col**: (Default:"all"). Either "all" or a list of column names you want to keep from the input file.
-- **library_type**: (Default:"rf"). Specify if your data is "stranded", "rf", "fr" or "unstranded".
-- **supp_map_to**: (Default:"None"). A list of supplementary references you want to map your sequences to, with no further informations (using blast).
+- **library_type**: (Default:"rf"). Strandedness: "rf", "fr" or "unstranded".
+- **supp_map_to**: (Default:"None"). A list of supplementary references you want to map your sequences to, with no further information (using blast).
 - **[reference]_fasta**: For each reference in `supp_map_to`, path to its fasta sequence. An exemple of a typical fasta file you could use (Human repeats from Dfam) is available in toy/references/.
 
 ## Output file
