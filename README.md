@@ -102,12 +102,12 @@ Any amount of supplementary alignment columns can be added to the output. For ea
 
 In order to use this feature, you need to specify in your config-file :
 
--supp_map_to : The name of the references you wish to add to your output as a list
--[reference]_fasta : The location of the fasta file for each reference
+- supp_map_to : The name of the references you wish to add to your output as a list
+- [reference]_fasta : The location of the fasta file for each reference
 
 Example: with a reference of human repeats provided in this repository (Dfam 3.1):
-"supp_map_to":["HumanRepeats"],
-"HumanRepeats_fasta" : "/home/Documents/Annotate-contigs/toy/references/human_repeat_ref.fasta",
+- "supp_map_to":["HumanRepeats"],
+- "HumanRepeats_fasta" : "/home/Documents/Annotate-contigs/toy/references/human_repeat_ref.fasta",
 
 ## Output file
 
