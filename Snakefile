@@ -228,9 +228,26 @@ if len(INDEX) > 1:
                 end_log(log[0],"STAR Alignment")
 
 
-rule add_bam_data:
+# This rule fixes a duplication issue with STARlong binary when used while chimeric detection is activated. See here : https://github.com/alexdobin/STAR/issues/597
+rule remove_STAR_duplicates:
     input:
         bam = OUTPUT_DIR + "/STAR_{ref}/Aligned.out.sam"
+    output:
+        bam_fixed = OUTPUT_DIR + "/STAR_{ref}/Aligned-fixed.out.sam",
+        dedup = OUTPUT_DIR + "/STAR_{ref}/Aligned.out.sam.remove_dedup",
+        count = OUTPUT_DIR + "/STAR_{ref}/count_by_query.txt"
+    log :
+        LOG_FOLDER + "/remove_STAR_duplicates.log"
+    run:
+        start_log(log[0],"remove_STAR_duplicates")
+        shell("cat {input.bam} |awk '{{if ($1$3$4$6 != prev) {{print}};prev=$1$3$4$6}}' > {output.dedup}")
+        shell("awk '$1 !~ \"^@\" {{print $1}}' {output.dedup} |uniq -c |awk '{{print $2\"\t\"$1}}' > {output.count}")
+        shell("awk 'NR==FNR {{nh[$1]=$2;next}} {{if ($1 !~ \"^@\") {{print $1\"\t\"$2\"\t\"$3\"\t\"$4\"\t\"$5\"\t\"$6\"\t\"$7\"\t\"$8\"\t\"$9\"\t\"$10\"\t\"$11\"\tNH:i:\"nh[$1]\"\t\"$13\"\t\"$14\"\t\"$15\"\t\"$16}} else {{print}} }}' {output.count} {output.dedup} > {output.bam_fixed}")
+        end_log(log[0],"remove_STAR_duplicates")
+
+rule add_bam_data:
+    input:
+        bam_fixed = OUTPUT_DIR + "/STAR_{ref}/Aligned-fixed.out.sam"
     params:
         strand = STRAND,
         id_col = UNIQUE_ID_COL,
@@ -241,7 +258,7 @@ rule add_bam_data:
         LOG_FOLDER + "/add_bam_data.log"
     run:
         start_log(log[0],"add_bam_data")
-        aBD.addBAMAnnotation(input.bam,output.bam_annot,params.strand,params.id_col,params.reference)
+        aBD.addBAMAnnotation(input.bam_fixed,output.bam_annot,params.strand,params.id_col,params.reference)
         end_log(log[0],"add_bam_data")
 
 
