@@ -8,7 +8,7 @@
   "supp_map_to":["HumanRepeats"],
   "HumanRepeats_fasta" : "/home/antoine.laine/Documents/Annotate-contigs/toy/references/human_repeat_ref.fasta",
   "output_dir": "/home/antoine.laine/Documents/Annotate-contigs/results",
-  "keep_col": ["contig","nb-merged-kmer","tag"],
+  "keep_col": ["contig","nb_merged_kmer","tag"],
   "threads": 4,
   "library_type": "unstranded"
 }
