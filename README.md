@@ -38,7 +38,7 @@ The tool was designed with Snakemake, so any user input as to be specified in a 
 It's advised to mount some volumes (input/output directories). Natively, a singularity image isn't able to access external data. To fix this, you have to mount your your directories as volumes.
 Using the parameter "-B /store:/store" will indicate singularity to reference your "store" directory if it is mentionned (in your configuration file, notably).
     ```
-    singularity -v run -B /store:/store ./general-annot.simg --configfile config.json --cores 4  
+    singularity -v run -B /home:/home ./general-annot.simg --configfile config.json --cores 4  
     ```
 
 
@@ -54,23 +54,28 @@ Using the parameter "-B /store:/store" will indicate singularity to reference yo
     - Any folder referenced in your `config.json`
     The following command is an example working with the `config.json` available in the repository.
     ```
-    sudo docker run -v ${PWD}/config.json:/annot/config.json -v /store:/store alaine1/gen-annot:latest
+    sudo docker run -v ${PWD}/config.json:/annot/config.json -v /home:/home alaine1/gen-annot:latest
     ```
 
 
 ### Option 3: From source (not recommended)
 
-- **Step 1: Install dependancies**. Before using the tool, install the dependencies (You can use conda):
-    - **Required**: bash (version >= 4.3.46), blast (version >= 2.5.0+), STAR (version >= 2.5.3), Python (version >= 3.6.3), Snakemake (version >= 3.12.0)
-    - Python packages (using pip install): intervaltree-3.1.0, numpy-1.18.1, pandas-1.1.4, pysam-0.16.0.1, python-dateutil-2.8.2, pytz-2021.1, sortedcontainers-2.4.0
-
-- **Step 2: Install the tool from Github repository**
+- **Step 1: Install the tool from Github repository**
     ```
     git clone https://github.com/Transipedia/Annotate-contigs && cd Annotate-contigs
     ```
+- **Step 2: Install dependancies**. Before using the tool, install the dependencies. You can install them manually, or using the environment.yml file while building a conda environment (usually easier):
+    - *Required packages*: bash (version >= 4.3.46), blast (version >= 2.5.0+), STAR (version >= 2.5.3), Python (version >= 3.6.3), Snakemake (version >= 3.12.0)
+    - Python packages (using pip install): intervaltree-3.1.0, numpy-1.18.1, pandas-1.1.4, pysam-0.16.0.1, python-dateutil-2.8.2, pytz-2021.1, sortedcontainers-2.4.0
+
+    ```
+    conda env create -f environment.yml -n gen-annot
+    conda activate gen-annot
+    ```
+
 - **Step 3: Edit config file & run with Snakemake.**    
     ```
-    snakemake
+    snakemake --configfile config.json
     ```
 
 ## Configuration
