@@ -1,4 +1,5 @@
 This tool takes a k-mer/contig table as input and produces an annotation file with mapping information for each k-mer/contig including position, intron/exon/intergenic location, gene name, CIGAR etc. Should work with any reference genome and annoattion as input.
+In this pipeline, we use two alignment tools, STAR and Minimap2. STAR is used for aligning sequences that are 200 bases or shorter, while Minimap2 is used for aligning sequences longer than 200 bases.
 
 This tool was initially thought as a less restrictive alternative to [DEkupl-annotation](https://github.com/Transipedia/dekupl-annotation). So many of its aspects are similar.
 
@@ -15,7 +16,7 @@ This tool was initially thought as a less restrictive alternative to [DEkupl-ann
 
 -   In order to run the tool, you will need at least 4 specific files (more if you intend to use multiple organisms):
     -   Input file : A tsv/csv file with at least 2 named columns. One contains the sequences you want to annotate, and each sequence must have a unique identifier. Typical input files are Dekupl-run/Kamrat outputs (example available in toy/input/).
-    -   Config file : As the pipeline is designed with snakemake, any run requires a cinfiguration file. See below for specifications of available parameters.
+    -   Config file : As the pipeline is designed with snakemake, any run requires a configuration file. See below for specifications of available parameters.
     -   Genome and annotation files : Associated fasta and gtf files of an organism (gz). Typically downloaded from [Ensembl](https://www.ensembl.org/index.html) or [Gencode](https://www.gencodegenes.org/) websites.(examples available in toy/references)
 
 ## Installation
@@ -65,17 +66,16 @@ Using the parameter "-B /store:/store" will indicate singularity to reference yo
     git clone https://github.com/Transipedia/Annotate-contigs && cd Annotate-contigs
     ```
 - **Step 2: Install dependancies**. Before using the tool, install the dependencies. You can install them manually, or using the environment.yml file while building a conda environment (usually easier):
-    - *Required packages*: bash (version >= 4.3.46), blast (version >= 2.5.0+), STAR (version >= 2.5.3), Python (version >= 3.6.3), Snakemake (version >= 3.12.0)
-    - Python packages (using pip install): intervaltree-3.1.0, numpy-1.18.1, pandas-1.1.4, pysam-0.16.0.1, python-dateutil-2.8.2, pytz-2021.1, sortedcontainers-2.4.0
-
+    - *Required packages*: bash (version >= 4.3.46), blast (version >= 2.5.0+), STAR (version >= 2.5.3), Python (version >= 3.6.3), Snakemake (version >= 3.12.0), (minimap2 >= 2.17-r941)
+    - Python packages (using pip install): intervaltree-3.1.0, numpy-1.18.1, pandas-1.1.4, pysam-0.16.0.1, python-dateutil-2.8.2, pytz-2021.1, sortedcontainers-2.4.0, biopython-1.79
     ```
-    conda env create -f environment.yml -n gen-annot
+    conda env create -f environment.yml
     conda activate gen-annot
     ```
 
 - **Step 3: Edit config file & run with Snakemake.**    
     ```
-    snakemake --configfile config.json
+    snakemake --configfile config.json --cores $nb_cores 
     ```
 
 ## Configuration
@@ -86,8 +86,9 @@ Your `config.json` should be the only file you have to interact with in order to
 - **input_file**: Path to the file containing sequences to annotate. (tsv/csv, gz or not)
 - **map_to**: A list of species/organisms on which the tool will try to map your sequences. Mapping is sequential and substractive, meaning if a sequence is mapped on the first organism of the list, we won't try to map it on the second, etc...
 - EITHER **[organism]_fasta & [organism]_gff** : Paths to fasta.gz and gtf.gz* (respectively) used to build the index of said organism, if it's the first time you use the tool with this organism. Exemples of such files for a human genome annotation are available in toy/references.
-- OR **[organism]_index**: Path to built index of said organism, if you already used the tool once with this organism.
-
+- OR **[organism]_index**: Path to built index using **STAR** of said organism, if you already used the tool once with this organism.
+- **[organism]_minimap2_index**: Path to built index using **Minimap2** of said organism, if you already used the tool once with this organism.
+- **preset**: Presets adjust various internal parameters of Minimap2, such as k-mer size, scoring schemes, and alignment heuristics, to optimize performance and accuracy for specific data types and applications. The default preset in the pipeline is "map-ont", but you can change it to other presets listed here: https://lh3.github.io/minimap2/minimap2.html#8
 
 ### *About the GTF
 Only the "exon" features of the GTF file will be used. In order for the program to run properly, the mandatory attributes (column 9) are : "gene_id", "transcript_id", "gene_type".
