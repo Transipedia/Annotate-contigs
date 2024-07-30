@@ -1,0 +1,14 @@
+{
+  "input_file": "/store/EQUIPES/SSFA/safa.maddouri/Transfert/70718_directContigsForAnnotation",
+  "sequence_col": "contig",
+  "id_col": "tag",
+  "map_to" : ["human"],
+  "supp_map_to" : ["repeats"],
+  "human_index" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/human_index",
+  "human_minimap2_index" :"/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/human_index/minimap2/human.mmi" ,
+  "repeats_fasta" : "/data/work/I2BC/safa.maddouri/gn_ann/general_annot/repeats/human_repeat_ref.fasta",
+  "output_dir": "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/test_pipeline",
+  "keep_col": ["contig","tag"],
+  "threads": 4,
+  "library_type": "unstranded"
+}
