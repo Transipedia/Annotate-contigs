@@ -88,7 +88,7 @@ Your `config.json` should be the only file you have to interact with in order to
 - EITHER **[organism]_fasta & [organism]_gff** : Paths to fasta.gz and gtf.gz* (respectively) used to build the index of said organism, if it's the first time you use the tool with this organism. Exemples of such files for a human genome annotation are available in toy/references.
 - OR **[organism]_index**: Path to built index using **STAR** of said organism, if you already used the tool once with this organism.
 - **[organism]_minimap2_index**: Path to built index using **Minimap2** of said organism, if you already used the tool once with this organism.
-- **preset**: Presets adjust various internal parameters of Minimap2, such as k-mer size, scoring schemes, and alignment heuristics, to optimize performance and accuracy for specific data types and applications. The default preset in the pipeline is "map-ont", but you can change it to other presets listed here: https://lh3.github.io/minimap2/minimap2.html#8
+- **preset**: Presets adjust various internal parameters of Minimap2, such as k-mer size, scoring schemes, and alignment heuristics, to optimize performance and accuracy for specific data types and applications. The default preset in the pipeline is "map-ont", but you can change it to other presets listed here: https://lh3.github.io/minimap2/minimap2.html#8. You should keep the same preset. 
 
 ### *About the GTF
 Only the "exon" features of the GTF file will be used. In order for the program to run properly, the mandatory attributes (column 9) are : "gene_id", "transcript_id", "gene_type".
