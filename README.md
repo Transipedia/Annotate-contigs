@@ -12,12 +12,6 @@ This tool was initially thought as a less restrictive alternative to [DEkupl-ann
 - [Output files](#output-files)
 - [Ontology](#ontology)
 
-## Usage
-
--   In order to run the tool, you will need at least 4 specific files (more if you intend to use multiple organisms):
-    -   Input file : A tsv/csv file with at least 2 named columns. One contains the sequences you want to annotate, and each sequence must have a unique identifier. Typical input files are Dekupl-run/Kamrat outputs (example available in toy/input/).
-    -   Config file : As the pipeline is designed with snakemake, any run requires a configuration file. See below for specifications of available parameters.
-    -   Genome and annotation files : Associated fasta and gtf files of an organism (gz). Typically downloaded from [Ensembl](https://www.ensembl.org/index.html) or [Gencode](https://www.gencodegenes.org/) websites.(examples available in toy/references)
 
 ## Installation
 
@@ -77,7 +71,12 @@ Using the parameter "-B /store:/store" will indicate singularity to reference yo
     ```
     snakemake --configfile config.json --cores $nb_cores 
     ```
+## Usage
 
+-   In order to run the tool, you will need at least 4 specific files (more if you intend to use multiple organisms):
+    -   Input file : A tsv/csv file with at least 2 named columns. One contains the sequences you want to annotate, and each sequence must have a unique identifier. Typical input files are Dekupl-run/Kamrat outputs (example available in toy/input/).
+    -   Config file : As the pipeline is designed with snakemake, any run requires a configuration file. See below for specifications of available parameters.
+    -   Genome and annotation files : Associated fasta and gtf files of an organism (gz). Typically downloaded from [Ensembl](https://www.ensembl.org/index.html) or [Gencode](https://www.gencodegenes.org/) websites.(examples available in toy/references)
 ## Configuration
 
 Your `config.json` should be the only file you have to interact with in order to run the annotation.
@@ -88,7 +87,8 @@ Your `config.json` should be the only file you have to interact with in order to
 - EITHER **[organism]_fasta & [organism]_gff** : Paths to fasta.gz and gtf.gz* (respectively) used to build the index of said organism, if it's the first time you use the tool with this organism. Exemples of such files for a human genome annotation are available in toy/references.
 - OR **[organism]_index**: Path to built index using **STAR** of said organism, if you already used the tool once with this organism.
 - **[organism]_minimap2_index**: Path to built index using **Minimap2** of said organism, if you already used the tool once with this organism.
-- **preset**: Presets adjust various internal parameters of Minimap2, such as k-mer size, scoring schemes, and alignment heuristics, to optimize performance and accuracy for specific data types and applications. The default preset in the pipeline is "map-ont", but you can change it to other presets listed here: https://lh3.github.io/minimap2/minimap2.html#8. You should keep the same preset. 
+- **preset**: Presets adjust various internal parameters of Minimap2, such as k-mer size, scoring schemes, and alignment heuristics, to optimize performance and accuracy for specific data types and applications. The default preset in the pipeline is "map-ont", but you can change it to other presets listed here: https://lh3.github.io/minimap2/minimap2.html#8.
+    **The preset used for index building must be consistent. Some presets may not provide information about chimeric reads. In such cases, you may need to build the index again using a different preset.**
 
 ### *About the GTF
 Only the "exon" features of the GTF file will be used. In order for the program to run properly, the mandatory attributes (column 9) are : "gene_id", "transcript_id", "gene_type".
