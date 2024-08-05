@@ -88,6 +88,7 @@ Your `config.json` should be the only file you have to interact with in order to
 - OR **[organism]_index**: Path to built index using **STAR** of said organism, if you already used the tool once with this organism.
 - **[organism]_minimap2_index**: Path to built index using **Minimap2** of said organism, if you already used the tool once with this organism.
 - **preset**: Presets adjust various internal parameters of Minimap2, such as k-mer size, scoring schemes, and alignment heuristics, to optimize performance and accuracy for specific data types and applications. The default preset in the pipeline is "map-ont", but you can change it to other presets listed here: https://lh3.github.io/minimap2/minimap2.html#8.
+  
     **The preset used for index building must be consistent. Some presets may not provide information about chimeric reads. In such cases, you may need to build the index again using a different preset.**
 
 ### *About the GTF
