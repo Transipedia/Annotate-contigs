@@ -1,4 +1,4 @@
-name: gen-annotate
+name: gen-annot
 channels:
   - bioconda
   - defaults
