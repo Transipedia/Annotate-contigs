@@ -1,7 +1,8 @@
 """
 @created: 29/09/21
-@modified: 28/10/22
+@modified: 20/09/2024
 @main_dev: Antoine Laine
+@modifed_by : Fadwa EL KHADDAR
     I2BC(SSFA)
 
 Adds general annotation information to any type of sequence. Mainly designed around kamrat/dekupl output formats, and inspired by dekupl-annotation process.
