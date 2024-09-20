@@ -6,7 +6,7 @@ import datetime
 import numpy as np
 import pandas as pd
 
-DataFrame = pd.core.frame.DataFrame
+DataFrame = pd.DataFrame  
 
 def loadTable(path: str, dtype=str, **kwargs) -> DataFrame:
     #File handler

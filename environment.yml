@@ -1,4 +1,4 @@
-name: annot-gen
+name: gen-annot
 channels:
   - bioconda
   - defaults
@@ -10,7 +10,7 @@ dependencies:
   - brotlipy=0.7.0=py36h27cfd23_1003
   - bzip2=1.0.8=h7b6447c_0
   - c-ares=1.17.1=h27cfd23_0
-  - ca-certificates=2021.10.26=h06a4308_2
+  - ca-certificates=2024.3.11=h06a4308_0
   - certifi=2021.5.30=py36h06a4308_0
   - cffi=1.14.6=py36h400218f_0
   - charset-normalizer=2.0.4=pyhd3eb1b0_0
@@ -34,8 +34,9 @@ dependencies:
   - libsodium=1.0.18=h7b6447c_0
   - libssh2=1.9.0=h1ba5d50_1
   - libstdcxx-ng=9.3.0=hd4cf53a_17
+  - minimap2=2.17=h8b12597_1
   - ncurses=6.2=he6710b0_1
-  - openssl=1.1.1l=h7f8727e_0
+  - openssl=1.1.1w=h7f8727e_0
   - paramiko=2.7.2=py_0
   - pcre=8.45=h295c915_0
   - perl=5.26.2=h14c3975_0
@@ -81,11 +82,11 @@ dependencies:
   - yaml=0.2.5=h7b6447c_0
   - zlib=1.2.11=h7b6447c_3
   - pip:
-    - intervaltree==3.1.0
-    - numpy==1.18.1
-    - pandas==1.1.4
-    - python-dateutil==2.8.2
-    - pytz==2021.1
-    - sortedcontainers==2.4.0
-    - pysam==0.16.0.1
-prefix: /home/antoine.laine/.conda/envs/annot-gen
+      - biopython==1.79
+      - intervaltree==3.1.0
+      - numpy==1.18.1
+      - pandas==1.1.4
+      - pysam==0.16.0.1
+      - python-dateutil==2.8.2
+      - pytz==2021.1
+      - sortedcontainers==2.4.0

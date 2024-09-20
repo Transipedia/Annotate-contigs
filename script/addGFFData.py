@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import script.loadGFF as lGFF
 
-DataFrame = pd.core.frame.DataFrame
+DataFrame = pd.DataFrame
 
 from intervaltree import Interval, IntervalTree
 
