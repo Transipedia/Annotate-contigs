@@ -1,18 +1,18 @@
 {
   "mode" : "index",
-  "input_file": "/data/work/I2BC/fadwa.elkhaddar/SSFA/NewVersionAnnotContig/data/merged_annotation.tsv",
+  "input_file": "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/data/input_table.tsv",
   "sequence_col": "contig",
   "id_col": "tag",
   "map_to" : ["human"],
   "supp_map_to" : ["repeats"],
   "preset" : "map-ont",
-  "supp_map_to_fasta" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/NewVersionAnnotContig/data/human_repeat_ref.fasta",
-  "output_dir": "/data/work/I2BC/fadwa.elkhaddar/SSFA/NewVersionAnnotContig/test_new_version",
+  "supp_map_to_fasta" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/data/human_repeat_ref.fasta",
+  "output_dir": "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/test_new_version",
   "keep_col": ["contig","tag"],
   "threads": 5,
   "library_type": "unstranded",
-  "reference": "/data/work/I2BC/fadwa.elkhaddar/SSFA/NewVersionAnnotContig/data/reference.fa.gz",
-  "annotation" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/NewVersionAnnotContig/data/part_annotation.gtf.gz",
-  "star_index" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/NewVersionAnnotContig/star",
-  "minimap2_index" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/NewVersionAnnotContig/minimap2/human.mmi"
+  "reference": "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/data/reference.fa.gz",
+  "annotation" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/data/part_annotation.gtf.gz",
+  "star_index" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/star",
+  "minimap2_index" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs/minimap2/human.mmi"
 }

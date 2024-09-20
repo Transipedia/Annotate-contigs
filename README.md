@@ -6,7 +6,7 @@ This tool was initially thought as a less restrictive alternative to [DEkupl-ann
 - [Usage](#usage)
 - [Installation](#installation)
     - [Option 1: With singularity](#option-1-with-singularity)
-    - [Option 2: From source](#option-3-from-source)
+    - [Option 2: From source](#option-2-from-source)
 - [Configuration](#configuration)
 - [Output files](#output-files)
 - [Ontology](#ontology)
@@ -32,12 +32,12 @@ You can upload the singularity image directly from the [link](https://zenodo.org
     wget https://zenodo.org/records/13789508/files/annotatecontig.sif?download=1 -O annotatecontig.sif
     ```
 - **Step 2: Create your configuration file**
-The tool was designed with Snakemake, so any user input as to be specified in a configuration file (`config.json`). An example of configuration file is available in the repository. The exhaustive list of all parameters is available in the next section.
+This tool is designed to work with Snakemake, which means that all user inputs must be defined in a configuration file (`config.json`). You can find an example of this configuration file in the repository. A comprehensive list of all parameters is provided in the following section.
 
 
 - **Step 3: Run with mounted volumes**
 It is advised to mount certain volumes (input/output directories). By default, a Singularity image cannot access external data. To fix this, you need to mount your directories as volumes. 
-Using the parameter -B /store:/store tells Singularity to reference your store directory when mentioned (notably in your configuration file). It is recommended that all your input files be located in the /store directory.
+Using the parameter `-B /store:/store` tells Singularity to reference your store directory when mentioned (notably in your configuration file). It is recommended that all your input files be located in the `/store` directory.
 
     ```
     singularity -v run -B /home:/home annotatecontig.sif -s ./Snakefile --configfile ./config.json --cores $nb_cores  
@@ -58,7 +58,6 @@ Using the parameter -B /store:/store tells Singularity to reference your store d
 
     ```
 
-
 - **Step 3: Edit config file & run with Snakemake.**    
 
     ```
@@ -72,12 +71,13 @@ inside the `config.json` you find all the parameters:
 ### Mandatory parameters :
 
 - **mode**: can be either "index" or "table".
+
   "index": Use this when running the pipeline for the first time to build the index.
   "table": Use this if the STAR and Minimap2 indexes already exist, and you only need to generate the table.
 
 - **input_file**: Path to the file containing sequences to annotate (supports tsv/csv, gzipped or uncompressed).
 
-- **map_to**: Name of the organism to which the tool will attempt to map your sequences.
+- **map_to**: Name of the organism to which the tool will  map your sequences.
 
 - **reference**: Path to the fasta.gz file used to build the index for the specified organism.
 
@@ -115,7 +115,7 @@ Any amount of supplementary alignment columns can be added to the output. For ea
 
 Example: with a reference of human repeats provided in this repository (Dfam 3.1):
 - "supp_map_to":["HumanRepeats"],
-- "supp_map_to_fasta" : "/home/Documents/Annotate-contigs/toy/references/human_repeat_ref.fasta",
+- "supp_map_to_fasta" : "/home/Documents/Annotate-contigs/data/human_repeat_ref.fasta",
 
 ## Output file
 

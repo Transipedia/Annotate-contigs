@@ -46,7 +46,7 @@ ANNOTATION = config['annotation']
 INDEX_STAR = config['star_index'] 
 INDEX_MINIMAP2 = config['minimap2_index']
 MODE = config['mode']
-MAX_THREADS = config['threads']
+MAX_THREADS = config['threads'] if 'supp_map_to' in config else 4
 TMP_FOLDER = OUTPUT_DIR + "/tmp"
 blast_dict = {}
 for REF in SUPP_MAP_TO:
