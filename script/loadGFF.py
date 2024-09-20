@@ -6,8 +6,7 @@ import datetime
 import numpy as np
 import pandas as pd
 
-DataFrame = pd.core.frame.DataFrame
-
+DataFrame = pd.DataFrame  
 from intervaltree import Interval, IntervalTree
 
 
