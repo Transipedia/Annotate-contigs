@@ -1,3 +1,5 @@
+#Annotate-Contigs:
+
 This tool takes a k-mer/contig table as input and produces an annotation file with mapping information for each k-mer/contig including position, intron/exon/intergenic location, gene name, CIGAR etc. Should work with any reference genome and annoattion as input.
 In this pipeline, we use two alignment tools, STAR and Minimap2. STAR is used for aligning sequences that are 200 bases or shorter, while Minimap2 is used for aligning sequences longer than 200 bases.
 
@@ -75,7 +77,7 @@ inside the `config.json` you find all the parameters:
   "index": Use this when running the pipeline for the first time to build the index.
   "table": Use this if the STAR and Minimap2 indexes already exist, and you only need to generate the table.
 
-- **input_file**: Path to the file containing sequences to annotate (supports tsv/csv, gzipped or uncompressed).
+- **input_file**: Path to the file containing sequences to annotate (supports tsv/csv, gzipped or uncompressed). Example in (data/input_file.tsv)
 
 - **map_to**: Name of the organism to which the tool will  map your sequences.
 
@@ -113,7 +115,7 @@ Only the "exon" features of the GTF file will be used. In order for the program 
 
 Any amount of supplementary alignment columns can be added to the output. For each supplementary reference provided, a single column will be added at the end of the output file specifying where the annotated sequence was aligned on this reference.  
 
-Example: with a reference of human repeats provided in this repository (Dfam 3.1):
+Example: with a reference of human repeats provided in this repository (data/human_repeat_ref.fasta):
 - "supp_map_to":["HumanRepeats"],
 - "supp_map_to_fasta" : "/home/Documents/Annotate-contigs/data/human_repeat_ref.fasta",
 
