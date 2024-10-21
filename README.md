@@ -125,8 +125,8 @@ Example: with a reference of human repeats provided in this repository (data/hum
 
 N.B : 
 You will also find some intermediate files in the output folder, specifically query_lt_200.fa and query_gt_200.fa. 
-If **query_lt_200.fa** is empty, it means that all the sequences in your query have a length of less than 200 bases, so you will have empty output files from STAR. 
-If **query_gt_200.fa** is empty, it means that all the sequences in your query have a length greater than 200 bases, so you will have empty output files from Minimap2.
+- If **query_lt_200.fa** is empty, it means that all the sequences in your query have a length of less than 200 bases, so you will have empty output files from STAR. 
+- If **query_gt_200.fa** is empty, it means that all the sequences in your query have a length greater than 200 bases, so you will have empty output files from Minimap2.
 
 ## Annotated values
 
