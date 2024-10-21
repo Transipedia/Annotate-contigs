@@ -1,4 +1,4 @@
-#Annotate-Contigs:
+# Annotate-Contigs:
 
 This tool takes a k-mer/contig table as input and produces an annotation file with mapping information for each k-mer/contig including position, intron/exon/intergenic location, gene name, CIGAR etc. Should work with any reference genome and annoattion as input.
 In this pipeline, we use two alignment tools, STAR and Minimap2. STAR is used for aligning sequences that are 200 bases or shorter, while Minimap2 is used for aligning sequences longer than 200 bases.
@@ -87,9 +87,9 @@ inside the `config.json` you find all the parameters:
 
 - **preset**: (Default : "map-ont") Adjusts internal parameters of Minimap2 (e.g., k-mer size, scoring schemes, alignment heuristics) to optimize performance and accuracy for specific data types, you can find other presets [here](https://lh3.github.io/minimap2/minimap2.html#8.). 
 
-- **minimap2_index**: Path to the pre-built Minimap2 index for the organism, if previously created.
+- **minimap2_index**: Path to the pre-built Minimap2 index for the organism, if previously created. if "index" mode, add ""
 
-- **star_index**: Path to the pre-built STAR index for the organism, if previously created.
+- **star_index**: Path to the pre-built STAR index for the organism, if previously created. if "index" mode, add ""
 
     **The preset used for index building must be consistent. Some presets may not provide information about chimeric reads. In such cases, you may need to build the index again using a different preset.**
 
@@ -122,6 +122,11 @@ Example: with a reference of human repeats provided in this repository (data/hum
 ## Output file
 
 - Table `merged_annotation.tsv`, summarizing for each contig, its location on the genome (if it's aligned), the sequence alignment informations, and other optionnal alignment informations.
+
+N.B : 
+You will also find some intermediate files in the output folder, specifically query_lt_200.fa and query_gt_200.fa. 
+If **query_lt_200.fa** is empty, it means that all the sequences in your query have a length of less than 200 bases, so you will have empty output files from STAR. 
+If **query_gt_200.fa** is empty, it means that all the sequences in your query have a length greater than 200 bases, so you will have empty output files from Minimap2.
 
 ## Annotated values
 
