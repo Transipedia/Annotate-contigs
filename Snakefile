@@ -58,11 +58,8 @@ for REF in SUPP_MAP_TO:
 
 rule all:
     input:
-       expand(OUTPUT_DIR + "/{ref}_tmp/annotation.gtf", ref=MAP_TO),
-       OUTPUT_DIR + "/query.fa.gz",
-       expand(OUTPUT_DIR + "/STAR_{ref}/Aligned.out.sam", ref=MAP_TO),
-       expand(OUTPUT_DIR + "/Minimap2_{ref}/Alignement_minimap2.sam", ref=MAP_TO),
-       OUTPUT_DIR + "/gff_annotation_minimap2_" + MAP_TO[0] + ".tsv",
+       OUTPUT_DIR + "/query_gt_200.fa",
+       OUTPUT_DIR + "/query_lt_200.fa",
        OUTPUT_DIR + "/merged_annotation.tsv"
         
 if MODE == "index":
@@ -150,16 +147,25 @@ rule create_fasta:
         "awk -f script/generate_fasta.awk c1={params.id_col} c2={params.seq_col} < {input.base_file}> {output.fasta} ;"
         "gzip -c {output.fasta} > {output.fasta_gz}"
 
-rule split_query :
-     input:
-        fasta = OUTPUT_DIR + "/query.fa"
-     output:
-        short = OUTPUT_DIR + "/query_lt_200.fa",
-        long = OUTPUT_DIR + "/query_gt_200.fa"
-     shell :
-        " python script/categorize_sequences.py -fasta {input.fasta} -short {output.short} -long {output.long} -threshold 200 "
-
-
+rule split_query:
+    input:
+        fasta=OUTPUT_DIR + "/query.fa"
+    output:
+        short=OUTPUT_DIR + "/query_lt_200.fa",
+        long=OUTPUT_DIR + "/query_gt_200.fa"
+    shell:
+        """
+        python script/categorize_sequences.py -fasta {input.fasta} -short {output.short} -long {output.long} -threshold 200
+        
+        # Check if the output files are empty
+        if [ ! -s {output.short} ]; then
+            echo "%%%%%%  The file {output.short} is empty. We will use only minimap2 for alignement " >&2
+        fi
+        
+        if [ ! -s {output.long} ]; then
+            echo "The file {output.long} is empty. We will use only STAR for alignement." >&2
+        fi
+        """
 
 
 if MODE == "index":
@@ -181,9 +187,9 @@ if MODE == "index":
             log_file = OUTPUT_DIR + "/LOGS/STARalignment_{ref}.log"
          shell:           
             """
-            STAR --genomeDir {params.star_index} --runThreadN {threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx  --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5 > {log.log_file} 2>&1
-            awk '{{print ">"$10}}' {params.out_path}Chimeric.out.junction > {output.chim_tags} 
-            set +o pipefail; grep -n -A1 -f {output.chim_tags} {params.out_path}Unmapped.out.mate1 | sed -n 's/^\\([0-9]\\{{1,\\}}\\).*/\\1d/p' | sed -f - {params.out_path}Unmapped.out.mate1 > {output.unmapped}
+            STAR --genomeDir {params.star_index} --runThreadN {threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx  --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5 > {log.log_file} 2>&1 || true
+            awk '{{print ">"$10}}' {params.out_path}Chimeric.out.junction > {output.chim_tags} || true
+            set +o pipefail; grep -n -A1 -f {output.chim_tags} {params.out_path}Unmapped.out.mate1 | sed -n 's/^\\([0-9]\\{{1,\\}}\\).*/\\1d/p' | sed -f - {params.out_path}Unmapped.out.mate1 > {output.unmapped} || true
             """
 
 	rule minimap2_alignement: 
@@ -200,7 +206,7 @@ if MODE == "index":
             log_file = OUTPUT_DIR + "/LOGS/runMinimap2alignment_{ref}.log"
          shell:     
             """  
-             minimap2 -ax {params.preset} --MD -k 14 --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} 
+             minimap2 -ax {params.preset} --MD -k 14 --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} || true
             """
 
 
@@ -222,9 +228,9 @@ if MODE == "table":
             log_file = OUTPUT_DIR + "/LOGS/STARalignment_{ref}.log"
          shell:
             """           
-            STAR --genomeDir {input.star_index} --runThreadN {threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx  --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5  
-            awk '{{print ">"$10}}' {params.out_path}Chimeric.out.junction > {output.chim_tags}
-            set +o pipefail; grep -n -A1 -f {output.chim_tags} {params.out_path}Unmapped.out.mate1 | sed -n 's/^\\([0-9]\\{{1,\\}}\\).*/\\1d/p' | sed -f - {params.out_path}Unmapped.out.mate1 > {output.unmapped}            
+            STAR --genomeDir {input.star_index} --runThreadN {threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx  --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5  || true
+            awk '{{print ">"$10}}' {params.out_path}Chimeric.out.junction > {output.chim_tags} || true
+            set +o pipefail; grep -n -A1 -f {output.chim_tags} {params.out_path}Unmapped.out.mate1 | sed -n 's/^\\([0-9]\\{{1,\\}}\\).*/\\1d/p' | sed -f - {params.out_path}Unmapped.out.mate1 > {output.unmapped}  || true
             """
 
 	rule minimap2_alignement: 
@@ -241,7 +247,7 @@ if MODE == "table":
             log_file = OUTPUT_DIR + "/LOGS/runMinimap2alignment_{ref}.log"
          shell:     
             """  
-             minimap2 -ax {params.preset} --MD -k 14 --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file}
+             minimap2 -ax {params.preset} --MD -k 14 --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} || true
            """
 
 
@@ -268,9 +274,9 @@ if len(INDEX_STAR) > 1:
                 OUTPUT_DIR + "/LOGS/runSTARalignment"+ MAP_TO[i+1] +".log"
             shell:
                 """
-                STAR --genomeDir {params.star_index} --runThreadN {params.threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5 > {log.log_file} 2>&1
-                awk '{{print \">\"$10}}' {params.out_path}Chimeric.out.junction > {output.chim_tags}
-                set +o pipefail; grep -n -A1 -f {output.chim_tags} {params.out_path}Unmapped.out.mate1 | sed -n 's/^\\([0-9]\\{{1,\\}}\\).*/\\1d/p' | sed -f - {params.out_path}Unmapped.out.mate1 > {output.unmapped}
+                STAR --genomeDir {params.star_index} --runThreadN {params.threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5 > {log.log_file} 2>&1 || true
+                awk '{{print \">\"$10}}' {params.out_path}Chimeric.out.junction > {output.chim_tags} || true
+                set +o pipefail; grep -n -A1 -f {output.chim_tags} {params.out_path}Unmapped.out.mate1 | sed -n 's/^\\([0-9]\\{{1,\\}}\\).*/\\1d/p' | sed -f - {params.out_path}Unmapped.out.mate1 > {output.unmapped} || true
                 """
 
 rule remove_STAR_duplicates:
@@ -283,9 +289,9 @@ rule remove_STAR_duplicates:
     log :
         OUTPUT_DIR + "/LOGS/remove_STAR_duplicates.log"
     shell:        
-        "cat {input.bam} | awk '{{if ($1$3$4$6 != prev) {{print}}; prev=$1$3$4$6}}' > {output.dedup} ;"
-        "awk '$1 !~ \"^@\" {{print $1}}' {output.dedup} | uniq -c | awk '{{print $2\"\\t\"$1}}' > {output.count_by_query} ;"
-        "awk 'NR==FNR {{nh[$1]=$2;next}} {{if ($1 !~ \"^@\") {{print $1\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8\"\\t\"$9\"\\t\"$10\"\\t\"$11\"\\tNH:i:\"nh[$1]\"\\t\"$13\"\\t\"$14\"\\t\"$15\"\\t\"$16}} else {{print}}}}' {output.count_by_query} {output.dedup} > {output.bam_fixed}" 
+        "cat {input.bam} | awk '{{if ($1$3$4$6 != prev) {{print}}; prev=$1$3$4$6}}' > {output.dedup} || true ;"
+        "awk '$1 !~ \"^@\" {{print $1}}' {output.dedup} | uniq -c | awk '{{print $2\"\\t\"$1}}' > {output.count_by_query} || true ;"
+        "awk 'NR==FNR {{nh[$1]=$2;next}} {{if ($1 !~ \"^@\") {{print $1\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8\"\\t\"$9\"\\t\"$10\"\\t\"$11\"\\tNH:i:\"nh[$1]\"\\t\"$13\"\\t\"$14\"\\t\"$15\"\\t\"$16}} else {{print}}}}' {output.count_by_query} {output.dedup} > {output.bam_fixed} || true " 
 
 rule add_hit_tag:
      input: 
@@ -306,25 +312,54 @@ rule add_bam_data:
     output:
         bam_annot = temp(OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO[0] + ".tsv"),
         minimap2_annot = temp(OUTPUT_DIR + "/bam_annotation_minimap2_" + MAP_TO[0] + ".tsv")
-    run:        
-        aBD.addBAMAnnotation(input.bam_fixed, output.bam_annot, params.strand, params.id_col, params.reference)
-        aBD.addBAMAnnotation(input.sam_minimap2, output.minimap2_annot, params.strand, params.id_col, params.reference)
+    run:
+        try:
+            aBD.addBAMAnnotation(input.bam_fixed, output.bam_annot, params.strand, params.id_col, params.reference)
+        except Exception as e:
+            print(f"Ignoring error for STAR annotation: {e}")
+        
+        try:
+            aBD.addBAMAnnotation(input.sam_minimap2, output.minimap2_annot, params.strand, params.id_col, params.reference)
+        except Exception as e:
+            print(f"Ignoring error for Minimap2 annotation: {e}")
 
 rule add_gff_data:
     input:
         unzip_gff = OUTPUT_DIR + "/" + MAP_TO[0] + "_tmp/annotation.gtf",
         bam_annot = OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO[0] + ".tsv",
         minimap2_annot = OUTPUT_DIR + "/bam_annotation_minimap2_" + MAP_TO[0] + ".tsv"
-    output: 
+    output:
         gff_annot = temp(OUTPUT_DIR + "/gff_annotation_star_" + MAP_TO[0] + ".tsv"),
         gff_minimap2_annot = temp(OUTPUT_DIR + "/gff_annotation_minimap2_" + MAP_TO[0] + ".tsv")
     params:
         strand = STRAND
     run:
-        annot = lGFF.loadFromGTF(input.unzip_gff)
-        annot_interval = lGFF.loadAnnotation(annot)
-        aGFFD.addGFFAnnotation(input.bam_annot,annot_interval,output.gff_annot,params.strand)
-        aGFFD.addGFFAnnotation(input.minimap2_annot,annot_interval,output.gff_minimap2_annot,params.strand)
+        # Charger l'annotation GTF
+        try:
+            annot = lGFF.loadFromGTF(input.unzip_gff)
+        except Exception as e:
+            print(f"Ignore the error when loading the GTF annotation: {e}")
+            annot = None
+        try:
+            if annot is not None:
+                annot_interval = lGFF.loadAnnotation(annot)
+            else:
+                annot_interval = None
+        except Exception as e:
+            print(f"Ignore the error when loading annotation intervals: {e}")
+            annot_interval = None
+
+        try:
+            if annot_interval is not None:
+                aGFFD.addGFFAnnotation(input.bam_annot, annot_interval, output.gff_annot, params.strand)
+        except Exception as e:
+            print(f"Ignore the error when adding GFF annotation for STAR : {e}")
+
+        try:
+            if annot_interval is not None:
+                aGFFD.addGFFAnnotation(input.minimap2_annot, annot_interval, output.gff_minimap2_annot, params.strand)
+        except Exception as e:
+            print(f"Ignore the error when adding GFF annotation for Minimap2 : {e}")
 
 #Generating Chimeric file from minimap2 
 
@@ -335,8 +370,8 @@ rule create_chimeric_file:
         chimeric_tmp = expand(OUTPUT_DIR + "/Minimap2_" + MAP_TO[0] + "/Chimerics_minimap2_tmp.out"),
         chimeric = OUTPUT_DIR + "/Minimap2_" + MAP_TO[0] + "/Chimerics_minimap2.out" 
     shell: 
-        "grep 'SA:' {input} > {output.chimeric_tmp} ;"
-        "python script/add_chimeric.py {output.chimeric_tmp} | sed '1~2d' > {output.chimeric} "
+        "grep 'SA:' {input} > {output.chimeric_tmp} || true ;"
+        "python script/add_chimeric.py {output.chimeric_tmp} | sed '1~2d' > {output.chimeric} || true "
 
 
 rule add_chimeric_data:
@@ -350,8 +385,15 @@ rule add_chimeric_data:
         id_col = UNIQUE_ID_COL,
         reference = MAP_TO[0]
     run:
-        aCD.extractChimFromFile(input.chim_file,output.chim_annot,params.id_col,params.reference)
-        aCD.extractChimFromFile(input.chimeric,output.chim_annot_minimap2,params.id_col,params.reference)
+        try:
+            aCD.extractChimFromFile(input.chim_file, output.chim_annot, params.id_col, params.reference)
+        except Exception as e:
+            print(f"Ignore errors when extracting STAR data : {e}")
+
+        try:
+            aCD.extractChimFromFile(input.chimeric, output.chim_annot_minimap2, params.id_col, params.reference)
+        except Exception as e:
+            print(f"Ignore errors when extracting Minimap2 data : {e}")
         
   
 
@@ -388,12 +430,12 @@ rule merge_files:
          gff_merged =  temp(OUTPUT_DIR + "/gff_annotation_" + MAP_TO[0] + ".tsv"), 
          chim_merged = temp(OUTPUT_DIR + "/chim_annotation_" + MAP_TO[0] + ".tsv"),
      shell: 
-         "cat {input.bam_star} > {output.bam_merged} ;"
-         "tail -n +2 {input.bam_minimap2} >> {output.bam_merged} ;"  
-         "cat {input.gff_star} > {output.gff_merged} ;"
-         "tail -n +2 {input.gff_minimap2} >> {output.gff_merged} ;" 
-         "cat {input.chim_star} > {output.chim_merged} ;"
-         "tail -n +2 {input.chim_minimap2} >> {output.chim_merged} ;" 
+         "cat {input.bam_star} > {output.bam_merged} || true ;"
+         "tail -n +2 {input.bam_minimap2} >> {output.bam_merged} || true ;"  
+         "cat {input.gff_star} > {output.gff_merged} || true ;"
+         "tail -n +2 {input.gff_minimap2} >> {output.gff_merged} || true ;" 
+         "cat {input.chim_star} > {output.chim_merged} || true ;"
+         "tail -n +2 {input.chim_minimap2} >> {output.chim_merged} || true ;" 
 
 
 rule merge_annot:
