@@ -163,4 +163,4 @@ You will also find some intermediate files in the output folder, specifically qu
 | seg1_cj                 | Str   | First segment of the chimeric junction |
 | seg2_cj                 | Str   | Second segment of the chimeric junction |
 
-### An additional column will be added for each reference added to the "supp_map_to" feature
+
