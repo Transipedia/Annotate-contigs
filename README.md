@@ -1,7 +1,7 @@
 # Annotate-Contigs:
 
 This tool takes a k-mer/contig table as input and produces an annotation file with mapping information for each k-mer/contig including position, intron/exon/intergenic location, gene name, CIGAR etc. Should work with any reference genome and annoattion as input.
-In this pipeline, we use two alignment tools, STAR and Minimap2. STAR is used for aligning sequences that are 200 bases or shorter, while Minimap2 is used for aligning sequences longer than 200 bases.
+In this pipeline, we use two alignment tools, STAR and Minimap2. STAR is used for aligning sequences that are 200 bases or shorter, while Minimap2 is used for aligning sequences greater than or equal 200 bases.
 
 This tool was initially thought as a less restrictive alternative to [DEkupl-annotation](https://github.com/Transipedia/dekupl-annotation). So many of its aspects are similar.
 
@@ -74,7 +74,7 @@ inside the `config.json` you find all the parameters:
 
 - **mode**: can be either "index" or "table".
 
-  "index": Use this when running the pipeline for the first time to build the index.
+  "index": Use this when running the pipeline for the first time to build the indexes.
   "table": Use this if the STAR and Minimap2 indexes already exist, and you only need to generate the table.
 
 - **input_file**: Path to the file containing sequences to annotate (supports tsv/csv, gzipped or uncompressed). Example in (data/input_file.tsv)
