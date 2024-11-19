@@ -60,7 +60,6 @@ rule all:
     input:
        OUTPUT_DIR + "/query_gt_200.fa",
        OUTPUT_DIR + "/query_lt_200.fa",
-       expand(OUTPUT_DIR + "/blast/{ref}.tsv", ref=SUPP_MAP_TO),
        OUTPUT_DIR + "/merged_annotation.tsv"
         
 if MODE == "index":
