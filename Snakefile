@@ -400,7 +400,7 @@ rule add_chimeric_data:
 
 if SUPP_MAP_TO:
     for i in range(len(SUPP_MAP_TO)):
-        rule: #supplementaryAlignment
+        rule Supplementary_Alignment: #supplementaryAlignment
             input:
                 query_fasta = OUTPUT_DIR + "/query.fa",
                 index_fasta = blast_dict[SUPP_MAP_TO[i]]
