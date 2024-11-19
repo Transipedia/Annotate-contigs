@@ -1,4 +1,4 @@
 .snakemake/
 human_index/
 update/
-
+configs/
