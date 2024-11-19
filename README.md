@@ -24,7 +24,16 @@ This tool was initially thought as a less restrictive alternative to [DEkupl-ann
 
 ## Installation
 
+### Clone the Repository
+
+To download this project, use the following command:  
+ 
+    ```
+    git clone https://github.com/Transipedia/Annotate-contigs && cd Annotate-contigs
+    ```
+
 We recommand to use [singularity](https://singularity.lbl.gov/) to use the tool, or using the manual installation.
+
 
 ### Option 1: With singularity
 
@@ -45,14 +54,9 @@ Using the parameter `-B /store:/store` tells Singularity to reference your store
     singularity -v run -B /home:/home annotatecontig.sif -s ./Snakefile --configfile ./config.json --cores $nb_cores  
     ```
 
-### Option 2: From source 
+### Option 2: From conda 
 
-- **Step 1: Install the tool from Github repository**
-    ```
-    git clone https://github.com/Transipedia/Annotate-contigs && cd Annotate-contigs
-    ```
-
-- **Step 2: Install dependancies**. Before using the tool, install the dependencies. You can install them manually using the conda environnement file [annotatecontig.yml](https://zenodo.org/records/13789508/files/annotatecontig.yml?download=1) :
+- **Step 1: Install dependancies**. Before using the tool, install the dependencies. You can install them manually using the conda environnement file [annotatecontig.yml](https://zenodo.org/records/13789508/files/annotatecontig.yml?download=1) :
 
     ```
     conda env create -f annotatecontig.yml
@@ -60,7 +64,7 @@ Using the parameter `-B /store:/store` tells Singularity to reference your store
 
     ```
 
-- **Step 3: Edit config file & run with Snakemake.**    
+- **Step 2: Edit config file & run with Snakemake.**    
 
     ```
     snakemake --configfile config.json --cores $nb_cores
