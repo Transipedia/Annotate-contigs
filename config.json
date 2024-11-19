@@ -1,18 +1,18 @@
 {
-  "mode" : "table",
-  "input_file": "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate_contig_new_version/data/query_20.tsv",
+  "mode" : "index",
+  "input_file": "path/to/you/query_input_file.tsv",
   "sequence_col": "contig",
   "id_col": "tag",
   "map_to" : ["human"],
-  "supp_map_to" : ["repeats"],
+  "supp_map_to" : [""],
   "preset" : "map-ont",
-  "supp_map_to_fasta" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate_contig_new_version/data/human_repeat_ref.fasta",
-  "output_dir": "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate-contigs_Update/Annotate-contigs/update",
+  "supp_map_to_fasta" : [""],
+  "output_dir": "",
   "keep_col": ["contig","tag"],
   "threads": 5,
   "library_type": "unstranded",
-  "reference": "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate_contig_new_version/data/reference.fa.gz",
-  "annotation" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate_contig_new_version/data/part_annotation.gtf.gz",
-  "star_index" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate_contig_new_version/human_index/star",
-  "minimap2_index" : "/data/work/I2BC/fadwa.elkhaddar/SSFA/Annotate_contig_new_version/data/minimap2_index.mmi"
+  "reference": "path/to/your/reference.fa.gz",
+  "annotation" : "path/to/your/part_annotation.gtf.gz",
+  "star_index" : "",
+  "minimap2_index" : ""
 }

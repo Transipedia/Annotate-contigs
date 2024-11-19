@@ -8,7 +8,6 @@
 Adds general annotation information to any type of sequence. Mainly designed around kamrat/dekupl output formats, and inspired by dekupl-annotation process.
 """
 #!/bin/python3 
-configfile: "config.json"
 import sys
 import re
 import os
@@ -28,8 +27,7 @@ import script.mergeAnnot as mA
 
 shell.executable('bash')
 
-with open('config.json', 'r') as config_file:
-        config = json.load(config_file)
+
 
 ### ========== Variables ========== ###
 SEQUENCE_FILE = config['input_file']
@@ -41,7 +39,6 @@ PRESET = config['preset'] if 'preset' in config else "map-ont"
 LIB_TYPE = config['library_type'] if 'library_type' in config else "rf"
 STRAND = True if LIB_TYPE in ["rf","fr","stranded"] else False
 MAP_TO = config['map_to']
-SUPP_MAP_TO = config['supp_map_to'] if 'supp_map_to' in config else []
 REFERENCE = config['reference']
 ANNOTATION = config['annotation']
 INDEX_STAR = config['star_index'] 
@@ -49,9 +46,12 @@ INDEX_MINIMAP2 = config['minimap2_index']
 MODE = config['mode']
 MAX_THREADS = config['threads'] if 'supp_map_to' in config else 4
 TMP_FOLDER = OUTPUT_DIR + "/tmp"
+SUPP_MAP_TO = config['supp_map_to'] if 'supp_map_to' in config else []
+SUPP_MAP_TO_FASTA = config['supp_map_to_fasta'] if 'supp_map_to_fasta' in config else []
 blast_dict = {}
-for REF in SUPP_MAP_TO:
-    blast_dict[REF] = config["supp_map_to_fasta"]
+for i in range(len(SUPP_MAP_TO)):
+    blast_dict[SUPP_MAP_TO[i]] = SUPP_MAP_TO_FASTA[i]
+
 
 
 ### ========== Rules ========== ###         
@@ -60,6 +60,7 @@ rule all:
     input:
        OUTPUT_DIR + "/query_gt_200.fa",
        OUTPUT_DIR + "/query_lt_200.fa",
+       expand(OUTPUT_DIR + "/blast/{ref}.tsv", ref=SUPP_MAP_TO),
        OUTPUT_DIR + "/merged_annotation.tsv"
         
 if MODE == "index":
@@ -462,3 +463,4 @@ rule merge_annot:
             shell("cat {chim_annot} >> {chim_all}".format(chim_annot=input.chim_annot[i],chim_all=output.chim_all ))
         shell(r"paste -d$'\t' {output.bam_all} {output.gff_all} > {output.bam_and_gff}")
         mA.mergeAll( input.base_file,output.bam_and_gff,input.blast_annot,output.chim_all,params.id_col,params.keep_col,output.merged_annot )
+

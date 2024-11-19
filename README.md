@@ -107,7 +107,7 @@ Only the "exon" features of the GTF file will be used. In order for the program 
 
 - **library_type**: (Default:"rf"). Strandedness: "rf", "fr" or "unstranded".
 
-- **supp_map_to**: (Default:"None"). A supplementary reference you want to map your sequences to, with no further information (using blast).
+- **supp_map_to**: (Default:[""]). List of supplementary reference names you want to map your sequences to, with no further information (using blast).
 
 - **supp_map_to_fasta**: For each reference in `supp_map_to`, path to its fasta sequence. An exemple of a typical fasta file you could use (Human repeats from Dfam) is available in data/.
 
@@ -117,7 +117,14 @@ Any amount of supplementary alignment columns can be added to the output. For ea
 
 Example: with a reference of human repeats provided in this repository (data/human_repeat_ref.fasta):
 - "supp_map_to":["HumanRepeats"],
-- "supp_map_to_fasta" : "/home/Documents/Annotate-contigs/data/human_repeat_ref.fasta",
+- "supp_map_to_fasta" : ["/home/Documents/Annotate-contigs/data/human_repeat_ref.fasta"],
+
+Example with Multiple References:
+If you have two supplementary references, e.g., human repeats and viral elements, the configuration would look like this:
+
+- "supp_map_to": ["HumanRepeats", "ViralElements"],
+- "supp_map_to_fasta": ["/home/Documents/Annotate-contigs/data/human_repeat_ref.fasta","/home/Documents/Annotate-contigs/data/viral_elements_ref.fasta" ]
+
 
 ## Output file
 
