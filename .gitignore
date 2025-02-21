@@ -17,4 +17,4 @@ data/human_repeat_ref.fasta.nto
 data/log2FC_sup3_lensup35_toAnnotate_safa.tsv
 data/melanoma_filteredFinal_log2fcSup2_lensup35_safa.tsv
 data/reference.fa.gz
-
+config_test.json
