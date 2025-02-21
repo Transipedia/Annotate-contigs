@@ -85,9 +85,9 @@ inside the `config.json` you find all the parameters:
 
 - **map_to**: Name of the organism to which the tool will  map your sequences.
 
-- **reference**: Path to the fasta.gz file used to build the index for the specified organism. Example for test [reference](https://zenodo.org/records/13820050/files/reference.fa.gz?download=1)
+- **reference**: Path to the fasta.gz file used to build the index for the specified organism. Only required in "index" mode, otherwise, you put "". Example for test [reference](https://zenodo.org/records/13820050/files/reference.fa.gz?download=1)
 
-- **annotation**: Path to the gtf.gz file used to build the index for the specified organism. Example for test [annotation](https://zenodo.org/records/13820050/files/part_annotation.gtf.gz?download=1)
+- **annotation**: Path to the gtf.gz file used to build the index for the specified organism. Required in "index" and "table" mode. Example for test [annotation](https://zenodo.org/records/13820050/files/part_annotation.gtf.gz?download=1)
 
 - **preset**: (Default : "map-ont") Adjusts internal parameters of Minimap2 (e.g., k-mer size, scoring schemes, alignment heuristics) to optimize performance and accuracy for specific data types, you can find other presets [here](https://lh3.github.io/minimap2/minimap2.html#8.). 
 

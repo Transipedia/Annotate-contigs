@@ -85,7 +85,7 @@ if MODE == "index":
                 log: 
                   log_file = expand(OUTPUT_DIR + "/LOGS/{ref}_index/star/{ref}.log",ref=MAP_TO)
                 shell:
-                   "STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.star} --genomeFastaFiles {input.unzip_fasta} --genomeSAindexNbases 13 -- sjdbGTFfile {input.unzip_gff} > {log.log_file} 2>&1"
+                   "STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.star} --genomeFastaFiles {input.unzip_fasta} --genomeSAindexNbases 14 --sjdbGTFfile {input.unzip_gff} > {log.log_file} 2>&1"
 
 	rule build_minimap2_index: 
                 input: 
@@ -99,27 +99,45 @@ if MODE == "index":
                 shell:
                    "minimap2 -x {params} -k 14 -d {output} {input} > {log.log_file} 2>&1 "
 
-rule copy_reference:
-    input:
-        fasta = REFERENCE,
-        gff = ANNOTATION
-    output:
-        cp_fasta = expand(OUTPUT_DIR + "/{ref}_tmp/reference.fa.gz",ref=MAP_TO),
-        cp_gff = expand(OUTPUT_DIR + "/{ref}_tmp/annotation.gtf.gz",ref=MAP_TO)
-    shell:
-        "cp {input.fasta} {output.cp_fasta} ;"
-        "cp {input.gff} {output.cp_gff}"
 
-rule gunzip_reference:
-    input:
-        fasta = OUTPUT_DIR + "/{ref}_tmp/reference.fa.gz",
-        gff = OUTPUT_DIR + "/{ref}_tmp/annotation.gtf.gz"
-    output:
-        unzip_fasta = OUTPUT_DIR + "/{ref}_tmp/reference.fa",
-        unzip_gff = OUTPUT_DIR + "/{ref}_tmp/annotation.gtf"
-    shell:
-        "gunzip -c {input.fasta} > {output.unzip_fasta} ;"
-        "gunzip -c {input.gff} > {output.unzip_gff}"
+REFERENCE_REQUIRED = not (MODE == "table")
+
+if REFERENCE_REQUIRED:
+   rule copy_reference:
+       input:
+           fasta = REFERENCE
+       output:
+           cp_fasta = expand(OUTPUT_DIR + "/{ref}_tmp/reference.fa.gz",ref=MAP_TO)
+       shell:
+           "cp {input.fasta} {output.cp_fasta} ;"
+
+   rule gunzip_reference:
+       input:
+           fasta = OUTPUT_DIR + "/{ref}_tmp/reference.fa.gz",
+       output:
+           unzip_fasta = OUTPUT_DIR + "/{ref}_tmp/reference.fa"
+       shell:
+           "gunzip -c {input.fasta} > {output.unzip_fasta} ;"
+
+
+
+
+rule copy_annotation: 
+    input: 
+       gff = ANNOTATION
+    output: 
+       cp_gff = expand(OUTPUT_DIR + "/{ref}_tmp/annotation.gtf.gz",ref=MAP_TO)
+    shell: 
+       "cp {input.gff} {output.cp_gff}"
+
+
+rule gunzip_annotation: 
+    input: 
+       gff = OUTPUT_DIR + "/{ref}_tmp/annotation.gtf.gz"
+    output: 
+       unzip_gff = OUTPUT_DIR + "/{ref}_tmp/annotation.gtf"
+    shell: 
+       "gunzip -c {input.gff} > {output.unzip_gff}"
 
 
 if SEQUENCE_FILE.endswith(".gz"):
@@ -334,7 +352,6 @@ rule add_gff_data:
     params:
         strand = STRAND
     run:
-        # Charger l'annotation GTF
         try:
             annot = lGFF.loadFromGTF(input.unzip_gff)
         except Exception as e:
@@ -462,4 +479,3 @@ rule merge_annot:
             shell("cat {chim_annot} >> {chim_all}".format(chim_annot=input.chim_annot[i],chim_all=output.chim_all ))
         shell(r"paste -d$'\t' {output.bam_all} {output.gff_all} > {output.bam_and_gff}")
         mA.mergeAll( input.base_file,output.bam_and_gff,input.blast_annot,output.chim_all,params.id_col,params.keep_col,output.merged_annot )
-
