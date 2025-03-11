@@ -457,7 +457,7 @@ if CONTAMINATION:
             set +o pipefail;
             # Blast query on fungi, viruses, and bacteria (combined databases)
             echo -e "{params.id_col}\t{params.cont}" > {output.cont_hits} ;
-            blastn -query {input.query_fasta} -db {input.db}/Fungi_new -max_hsps 1 -max_target_seqs 1 -evalue 1e-3 -outfmt "6 qseqid sallseqid salltitles" | awk 'BEGIN {{OFS="\\t"}} {{$2=$2"-"$3; for (i=4; i<=NF; i++) $2=$2" "$i; print $1, $2}}' >> {output.cont_hits} 2>> {log.log}
+            blastn -query {input.query_fasta} -db {input.db} -max_hsps 1 -max_target_seqs 1 -evalue 1e-3 -outfmt "6 qseqid sallseqid salltitles" | awk 'BEGIN {{OFS="\\t"}} {{$2=$2"-"$3; for (i=4; i<=NF; i++) $2=$2" "$i; print $1, $2}}' >> {output.cont_hits} 2>> {log.log}
             """
 
 
