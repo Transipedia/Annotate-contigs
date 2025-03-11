@@ -14,5 +14,7 @@
   "reference": "",
   "annotation" : "/path/to/annotation.gtf.gz",
   "star_index" : "",
-  "minimap2_index" : ""
+  "minimap2_index" : "",
+  "contamination": False,
+  "database" : "",
 }

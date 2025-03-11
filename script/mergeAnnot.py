@@ -20,7 +20,17 @@ def loadTable(path: str, dtype=str, **kwargs) -> DataFrame:
     return df
 
 
-def mergeAll(input_table,bam_and_gff,blast,chim,unique_id_col,column_to_keep,output_file):
+
+
+
+def mergeAll(input_table,bam_and_gff,blast,chim, contamination, unique_id_col,column_to_keep,output_file):
+    print("===== mergeAll() INPUT FILES =====")
+    print("Base file:", input_table)
+    print("BAM and GFF file:", bam_and_gff)
+    print("Blast files:", blast)
+    print("Chim file:", chim)
+    print("Contamination hits:", contamination)
+
     #Load BAM/GFF annotated table
     merged = mergeBAM_GFF(input_table,bam_and_gff,unique_id_col,column_to_keep,output_file)
 
@@ -42,6 +52,13 @@ def mergeAll(input_table,bam_and_gff,blast,chim,unique_id_col,column_to_keep,out
         merged = pd.merge(left = merged,right = blast_loaded, how = "outer", on = unique_id_col)
     merged.to_csv(output_file,sep="\t", index = False,na_rep="NA")
 
+   #Add (optional) contamination (bacteria, virus, fungi) information
+    for cont in contamination: 
+        cont_loaded = loadTable(cont)
+        merged = pd.merge(left = merged, right = cont_loaded, how = "outer", on = unique_id_col)
+    merged.to_csv(output_file, sep="\t", index= False,na_rep="NA")
+
+
 
 def mergeBAM_GFF(input_table,bam_and_gff,unique_id_col,column_to_keep,output_file):
     #Load selected columns from initial file
@@ -55,3 +72,30 @@ def mergeBAM_GFF(input_table,bam_and_gff,unique_id_col,column_to_keep,output_fil
     merged = pd.merge(left = base_file,right = bam_gff, how = "outer", on = unique_id_col)
     merged.fillna(value={"mapped_to":"None"})
     return merged
+
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 10:
+        print("Usage: python script.py <input_table> <bam_and_gff> <blast> <chim> <contamination> <unique_id_col> <column_to_keep> <output_file>")
+        sys.exit(1)
+
+    input_table = sys.argv[1]
+    bam_and_gff = sys.argv[2]
+    blast = sys.argv[3].split(',')
+    chim = sys.argv[4]
+    contamination = sys.argv[5].split(',')
+    unique_id_col = sys.argv[8]
+    column_to_keep = sys.argv[9].split(',')
+    output_file = sys.argv[10]
+
+    # Check if input files exist
+    for file in [input_table, bam_and_gff, chim] + blast + contamination:
+        if not os.path.exists(file):
+            print(f"Error: File {file} does not exist.")
+            sys.exit(1)
+
+    # Run the merging function
+    mergeAll(input_table, bam_and_gff, blast, chim, contamination, unique_id_col, column_to_keep, output_file)
+    print(f"Merging completed. Output saved to {output_file}.")
+

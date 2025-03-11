@@ -52,6 +52,11 @@ blast_dict = {}
 for i in range(len(SUPP_MAP_TO)):
     blast_dict[SUPP_MAP_TO[i]] = SUPP_MAP_TO_FASTA[i]
 
+CONTAMINATION = config.get("contamination", False)
+
+if CONTAMINATION: 
+	DATABASE = config["database"]
+
 
 
 ### ========== Rules ========== ###         
@@ -60,8 +65,9 @@ rule all:
     input:
        OUTPUT_DIR + "/query_gt_200.fa",
        OUTPUT_DIR + "/query_lt_200.fa",
-       OUTPUT_DIR + "/merged_annotation.tsv"
-        
+       OUTPUT_DIR + "/merged_annotation.tsv"      
+
+
 if MODE == "index":
 	rule organize_reference:
                input:
@@ -224,7 +230,7 @@ if MODE == "index":
             log_file = OUTPUT_DIR + "/LOGS/runMinimap2alignment_{ref}.log"
          shell:     
             """  
-             minimap2 -ax {params.preset} --MD -k 14 --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} || true
+             minimap2 -ax {params.preset} --MD -k 14 --splice --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} || true
             """
 
 
@@ -265,7 +271,7 @@ if MODE == "table":
             log_file = OUTPUT_DIR + "/LOGS/runMinimap2alignment_{ref}.log"
          shell:     
             """  
-             minimap2 -ax {params.preset} --MD -k 14 --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} || true
+             minimap2 -ax {params.preset} --MD -k 14 --splice --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} || true
            """
 
 
@@ -434,6 +440,27 @@ if SUPP_MAP_TO:
                 shell("blastn -query {input.query_fasta} -db {input.index_fasta} -word_size 11 -max_hsps 1 -max_target_seqs 1 -evalue 1e-3 -outfmt \"6 qseqid sseqid\" 1>>{output.blast_out} 2>>{log.log_file}")
 
 
+if CONTAMINATION:
+    rule contamination_detection:
+        input: 
+            query_fasta = OUTPUT_DIR + "/query.fa",
+            db = DATABASE
+        output: 
+            cont_hits = OUTPUT_DIR + "/contamination/contaminations_hits.tsv"
+        params: 
+            cont = "contaminations",
+            id_col = UNIQUE_ID_COL
+        log: 
+            log = OUTPUT_DIR + "/LOGS/runBLAST_Contamination.log"
+        shell: 
+            """
+            set +o pipefail;
+            # Blast query on fungi, viruses, and bacteria (combined databases)
+            echo -e "{params.id_col}\t{params.cont}" > {output.cont_hits} ;
+            blastn -query {input.query_fasta} -db {input.db}/Fungi_new -max_hsps 1 -max_target_seqs 1 -evalue 1e-3 -outfmt "6 qseqid sallseqid salltitles" | awk 'BEGIN {{OFS="\\t"}} {{$2=$2"-"$3; for (i=4; i<=NF; i++) $2=$2" "$i; print $1, $2}}' >> {output.cont_hits} 2>> {log.log}
+            """
+
+
 rule merge_files:
      input: 
          bam_star= OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO[0] + ".tsv",
@@ -455,17 +482,22 @@ rule merge_files:
          "tail -n +2 {input.chim_minimap2} >> {output.chim_merged} || true ;" 
 
 
+
+
+
+
 rule merge_annot:
     input:
         bam_annot = expand(OUTPUT_DIR + "/bam_annotation_{ref}.tsv", ref=MAP_TO),
         gff_annot = expand( OUTPUT_DIR + "/gff_annotation_{ref}.tsv", ref=MAP_TO),
         chim_annot = expand( OUTPUT_DIR + "/chim_annotation_{ref}.tsv" ,ref=MAP_TO),
         blast_annot = expand( OUTPUT_DIR + "/blast/{ref}.tsv", ref=SUPP_MAP_TO) if SUPP_MAP_TO else [],
-        base_file = SEQUENCE_FILE
+        base_file = SEQUENCE_FILE,
+        cont_hits = [OUTPUT_DIR + "/contamination/contaminations_hits.tsv"] if config.get("contamination", False) else []
     output:
         merged_annot = OUTPUT_DIR + "/merged_annotation.tsv",
         bam_and_gff = temp(OUTPUT_DIR + "/tmp.tsv"),
-        bam_all = temp(OUTPUT_DIR + "r/bam.tsv"),
+        bam_all = temp(OUTPUT_DIR + "/bam.tsv"),
         gff_all = temp(OUTPUT_DIR + "/gff.tsv"),
         chim_all = temp(OUTPUT_DIR + "/chim.tsv"),
     params:
@@ -478,4 +510,17 @@ rule merge_annot:
             shell("cat {gff_annot} >> {gff_all}".format(gff_annot=input.gff_annot[i],gff_all=output.gff_all ))
             shell("cat {chim_annot} >> {chim_all}".format(chim_annot=input.chim_annot[i],chim_all=output.chim_all ))
         shell(r"paste -d$'\t' {output.bam_all} {output.gff_all} > {output.bam_and_gff}")
-        mA.mergeAll( input.base_file,output.bam_and_gff,input.blast_annot,output.chim_all,params.id_col,params.keep_col,output.merged_annot )
+        contamination_hits = input.cont_hits if isinstance(input.cont_hits, list) else []
+
+        mA.mergeAll(
+             input.base_file,
+             output.bam_and_gff,
+             list(input.blast_annot) if isinstance(input.blast_annot, list) else [input.blast_annot],
+             output.chim_all,
+             contamination_hits,
+             params.id_col,
+             params.keep_col if isinstance(params.keep_col, list) else [params.keep_col],
+             output.merged_annot
+          )
+
+

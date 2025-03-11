@@ -89,7 +89,7 @@ inside the `config.json` you find all the parameters:
 
 - **annotation**: Path to the gtf.gz file used to build the index for the specified organism. Required in "index" and "table" mode. Example for test [annotation](https://zenodo.org/records/13820050/files/part_annotation.gtf.gz?download=1)
 
-- **preset**: (Default : "map-ont") Adjusts internal parameters of Minimap2 (e.g., k-mer size, scoring schemes, alignment heuristics) to optimize performance and accuracy for specific data types, you can find other presets [here](https://lh3.github.io/minimap2/minimap2.html#8.). 
+- **preset**: (Default : "splice") Adjusts internal parameters of Minimap2 (e.g., k-mer size, scoring schemes, alignment heuristics) to optimize performance and accuracy for specific data types, you can find other presets [here](https://lh3.github.io/minimap2/minimap2.html#8.). 
 
 - **minimap2_index**: Path to the pre-built Minimap2 index for the organism, if previously created. if "index" mode, add ""
 
@@ -114,6 +114,10 @@ Only the "exon" features of the GTF file will be used. In order for the program 
 - **supp_map_to**: (Default:[""]). List of supplementary reference names you want to map your sequences to, with no further information (using blast).
 
 - **supp_map_to_fasta**: For each reference in `supp_map_to`, path to its fasta sequence. An exemple of a typical fasta file you could use (Human repeats from Dfam) is available in data/.
+
+- **contamination** : Set to True if you want to detect contamination from Bacteria, Fungi, or Viruses (Default: False).
+
+- **database** : If contamination is set to True, specify the path to the BLAST-generated databases here. 
 
 ### *About supplementary alignment
 
