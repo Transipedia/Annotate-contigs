@@ -115,7 +115,7 @@ Only the "exon" features of the GTF file will be used. In order for the program 
 
 - **supp_map_to_fasta**: For each reference in `supp_map_to`, path to its fasta sequence. An exemple of a typical fasta file you could use (Human repeats from Dfam) is available in data/.
 
-- **contamination** : Set to True if you want to detect contamination from Bacteria, Fungi, or Viruses (Default: False).
+- **contamination** : (Default: False). Toggle contaminant detection.
 
 - **database** : If contamination is set to True, specify the path to the BLAST-generated databases here. 
 
