@@ -180,7 +180,7 @@ You will also find some intermediate files in the output folder, specifically qu
 
 ## Example 
 
-<Example>
+<details>
 </summary> Example usage (click to expand) </summary>
 
 After installing the tool, in the data folder, we have the directory containing the files we'll need.  
