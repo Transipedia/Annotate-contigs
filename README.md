@@ -80,7 +80,7 @@ inside the `config.json` you find all the parameters:
   "index": Use this when running the pipeline for the first time to build the indexes.
   "table": Use this if the STAR and Minimap2 indexes already exist, and you only need to generate the table.
 
-- **input_file**: Path to the file containing sequences to annotate (supports tsv/csv, gzipped or uncompressed). Example in (data/input_file.tsv)
+- **input_file**: Path to the file containing sequences to annotate (supports tsv/csv, gzipped or uncompressed). Example in (data/Pancreas_data_example.tsv)
 
 - **map_to**: Name of the organism to which the tool will  map your sequences.
 
