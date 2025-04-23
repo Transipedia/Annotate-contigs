@@ -211,7 +211,7 @@ and also downloaded and decompressed the BLAST database.
   "annotation" : "annotation.gtf.gz",
   "star_index" : "human_index/star",
   "minimap2_index" : "human_index/minimap2/human.mmi",
-  "contamination": true,
+  "contamination": True,
   "database": "Annotate-contigs/databases/db_bacteria_virus_fungi"
 }
 
