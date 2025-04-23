@@ -181,7 +181,7 @@ You will also find some intermediate files in the output folder, specifically qu
 ## Example 
 
 <details>
-</summary> Example usage (click to expand) </summary>
+</summary> Example usage </summary>
 
 After installing the tool, in the data folder, we have the directory containing the files we'll need.  
 Assuming that you have already generated the minimap2 and STAR indexes,  
