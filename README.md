@@ -116,7 +116,7 @@ Only the "exon" features of the GTF file will be used. In order for the program 
 
 - **contamination** : (Default: False). Toggle contaminant detection.
 
-- **database** : If contamination is set to True, specify the path to the BLAST-generated databases here. 
+- **database** : If contamination is set to True, specify the path to the BLAST-generated [database](https://zenodo.org/records/15235871/files/db_bacteria_virus_fungi.tar.gz?download=1) here. 
 
 ### *About supplementary alignment
 
@@ -136,11 +136,14 @@ If you have two supplementary references, e.g., human repeats and viral elements
 ## Output file
 
 - Table `merged_annotation.tsv`, summarizing for each contig, its location on the genome (if it's aligned), the sequence alignment informations, and other optionnal alignment informations.
+If you choose to detect contaminations and repeats, you will get two additional columns (Repeats and Contamination).
 
 N.B : 
 You will also find some intermediate files in the output folder, specifically query_lt_200.fa and query_gt_200.fa. 
 - If **query_lt_200.fa** is empty, it means that all the sequences in your query have a length of less than 200 bases, so you will have empty output files from STAR. 
 - If **query_gt_200.fa** is empty, it means that all the sequences in your query have a length greater than 200 bases, so you will have empty output files from Minimap2.
+
+
 
 ## Annotated values
 
