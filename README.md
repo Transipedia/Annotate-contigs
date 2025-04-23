@@ -27,10 +27,9 @@ This tool was initially thought as a less restrictive alternative to [DEkupl-ann
 ### Clone the Repository
 
 To download this project, use the following command:  
- 
-    ```
+ ```
     git clone https://github.com/Transipedia/Annotate-contigs && cd Annotate-contigs
-    ```
+ ```
 
 We recommand to use [singularity](https://singularity.lbl.gov/) to use the tool, or using the manual installation.
 
@@ -179,7 +178,9 @@ You will also find some intermediate files in the output folder, specifically qu
 | seg2_cj                 | Str   | Second segment of the chimeric junction |
 
 
-<details>
+## Example 
+
+<Example>
 </summary> Example usage (click to expand) </summary>
 
 After installing the tool, in the data folder, we have the directory containing the files we'll need.  
