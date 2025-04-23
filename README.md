@@ -179,3 +179,65 @@ You will also find some intermediate files in the output folder, specifically qu
 | seg2_cj                 | Str   | Second segment of the chimeric junction |
 
 
+<details>
+</summary> Example usage (click to expand) </summary>
+
+After installing the tool, in the data folder, we have the directory containing the files we'll need.  
+Assuming that you have already generated the minimap2 and STAR indexes,  
+retrieved the `annotation.gtf.gz` file,  
+and also downloaded and decompressed the BLAST database.
+
+### Config file should be like this:
+
+```json
+{
+  "mode" : "table",
+  "input_file": "Annotate-contigs/data/Pancreas_data_example.tsv",
+  "sequence_col": "contig",
+  "id_col": "tag",
+  "map_to" : ["human"],
+  "supp_map_to" : ["repeats"],
+  "preset" : "splice",
+  "supp_map_to_fasta" : ["Annotate-contigs/data/human_repeat_ref.fasta"],
+  "output_dir": "Example",
+  "keep_col": ["contig","tag"],
+  "threads": 5,
+  "library_type": "unstranded",
+  "reference": "",
+  "annotation" : "annotation.gtf.gz",
+  "star_index" : "human_index/star",
+  "minimap2_index" : "human_index/minimap2/human.mmi",
+  "contamination": true,
+  "database": "Annotate-contigs/databases/db_bacteria_virus_fungi"
+}
+
+```
+
+Then, execute this command line :
+
+
+```bash
+singularity -v run -B /home:/home annotatecontig.sif -s ./Snakefile --configfile ./config.json --cores 4 
+```
+
+At the end of the execution, you wil have a folder named "Example" containing the following structure: 
+
+```bash
+.
+|-- LOGS  
+|-- Minimap2_human  
+|-- STAR_human  
+|-- blast  
+|-- contamination  
+|-- human_tmp  
+|-- merged_annotation.tsv  
+|-- query.fa.gz  
+|-- query_gt_200.fa  
+`-- query_lt_200.fa  
+
+```
+
+The final file, which contains the global annotation table, is merged_annotation.tsv.
+It is located in the output folder inside data/.
+
+Note: The last two columns are optional. In this example, we chose to include repeat elements and detect contaminations.

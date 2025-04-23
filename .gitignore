@@ -32,3 +32,4 @@ script/mergeAnnot_update.py
 script/mergeAnnot_original.py
 script/mergeAnnot_all_db.py
 script/__pycache__/mergeAnnot_original.cpython-312.pyc
+data/output/

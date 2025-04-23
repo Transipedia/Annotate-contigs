@@ -450,16 +450,18 @@ if CONTAMINATION:
         params: 
             cont = "contaminations",
             id_col = UNIQUE_ID_COL
+        resources:
+            mem_mb = 8000
+        threads: 1
         log: 
             log = OUTPUT_DIR + "/LOGS/runBLAST_Contamination.log"
         shell: 
-            """
-            set +o pipefail;
-            # Blast query on fungi, viruses, and bacteria (combined databases)
-            echo -e "{params.id_col}\t{params.cont}" > {output.cont_hits} ;
-            blastn -query {input.query_fasta} -db {input.db} -max_hsps 1 -max_target_seqs 1 -evalue 1e-3 -outfmt "6 qseqid sallseqid salltitles" | awk 'BEGIN {{OFS="\\t"}} {{$2=$2"-"$3; for (i=4; i<=NF; i++) $2=$2" "$i; print $1, $2}}' >> {output.cont_hits} 2>> {log.log}
-            """
-
+           """
+           set +o pipefail;
+           # Blast query on fungi, viruses, and bacteria (combined databases)
+           echo -e "{params.id_col}\t{params.cont}" > {output.cont_hits} ;
+           blastn -query {input.query_fasta} -db {input.db}/db_bacteria_virus_fungi -max_hsps 1 -max_target_seqs 1 -evalue 1e-3 -outfmt "6 qseqid salltitles" >> {output.cont_hits} 2>> {log.log}
+           """
 
 rule merge_files:
      input: 
