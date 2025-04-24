@@ -34,3 +34,4 @@ script/mergeAnnot_all_db.py
 script/__pycache__/mergeAnnot_original.cpython-312.pyc
 data/output/
 data/contigs.txt
+config_index.json

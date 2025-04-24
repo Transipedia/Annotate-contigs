@@ -81,8 +81,8 @@ if MODE == "index":
                   "cp {input.gff} {output.cp_gff}"
 	rule build_star_index:
                 input:
-                  unzip_fasta = OUTPUT_DIR + MAP_TO + "_tmp/reference.fa",
-                  unzip_gff = OUTPUT_DIR + MAP_TO + "_tmp/annotation.gtf"
+                  unzip_fasta = OUTPUT_DIR + "/" + MAP_TO + "_tmp/reference.fa",
+                  unzip_gff = OUTPUT_DIR + "/" + MAP_TO + "_tmp/annotation.gtf"
                 output:
                   star_sa = MAP_TO + "_index/star/SA"
                 params:
