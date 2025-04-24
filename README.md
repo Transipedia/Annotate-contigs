@@ -80,19 +80,19 @@ inside the `config.json` you find all the parameters:
   "index": Use this when running the pipeline for the first time to build the indexes.
   "table": Use this if the STAR and Minimap2 indexes already exist, and you only need to generate the table.
 
-- **input_file**: Path to the file containing sequences to annotate (supports tsv/csv, gzipped or uncompressed). Example in (data/Pancreas_data_example.tsv)
+- **input_file**: Path to the file containing sequences to annotate (supports tsv/csv, gzipped or uncompressed). Example in (data/input_table.tsv)
 
-- **map_to**: Name of the organism to which the tool will  map your sequences.
+- **map_to**: Name of the organism to be used in output files and the annotation table. (e.g: map_to : "human")
 
 - **reference**: Path to the fasta.gz file used to build the index for the specified organism. Only required in "index" mode, otherwise, you put "". Example for test [reference](https://zenodo.org/records/13820050/files/reference.fa.gz?download=1)
 
 - **annotation**: Path to the gtf.gz file used to build the index for the specified organism. Required in "index" and "table" mode. Example for test [annotation](https://zenodo.org/records/13820050/files/part_annotation.gtf.gz?download=1)
 
-- **preset**: (Default : "splice") Adjusts internal parameters of Minimap2 (e.g., k-mer size, scoring schemes, alignment heuristics) to optimize performance and accuracy for specific data types, you can find other presets [here](https://lh3.github.io/minimap2/minimap2.html#8.). 
+- **minimap2_index**: Path to the pre-built Minimap2 genome index for the organism, if previously created. if "index" mode, add ""
 
-- **minimap2_index**: Path to the pre-built Minimap2 index for the organism, if previously created. if "index" mode, add ""
+- **star_index**: Path to the pre-built STAR genome index for the organism, if previously created. if "index" mode, add ""
 
-- **star_index**: Path to the pre-built STAR index for the organism, if previously created. if "index" mode, add ""
+- **preset**: (Default : "splice") Adjusts internal parameters of Minimap2 (e.g., k-mer size, scoring schemes, alignment heuristics) to optimize performance and accuracy for specific data types, you can>
 
     **The preset used for index building must be consistent. Some presets may not provide information about chimeric reads. In such cases, you may need to build the index again using a different preset.**
 
@@ -117,6 +117,8 @@ Only the "exon" features of the GTF file will be used. In order for the program 
 - **contamination** : (Default: False). Toggle contaminant detection.
 
 - **database** : If contamination is set to True, specify the path to the BLAST-generated [database](https://zenodo.org/records/15235871/files/db_bacteria_virus_fungi.tar.gz?download=1) here. 
+
+- **threads** : Number of threads.
 
 ### *About supplementary alignment
 
@@ -196,7 +198,7 @@ and also downloaded and decompressed the BLAST database.
 ```json
 {
   "mode" : "table",
-  "input_file": "Annotate-contigs/data/Pancreas_data_example.tsv",
+  "input_file": "Annotate-contigs/data/input_file.tsv",
   "sequence_col": "contig",
   "id_col": "tag",
   "map_to" : ["human"],

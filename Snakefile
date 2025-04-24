@@ -71,36 +71,36 @@ rule all:
 if MODE == "index":
 	rule organize_reference:
                input:
-                  fasta = expand(REFERENCE),
-                  gff = expand(ANNOTATION)
+                  fasta = REFERENCE,
+                  gff = ANNOTATION
                output:
-                  fasta = expand("{ref}_index/reference.fa.gz", ref=MAP_TO),
-                  gff = expand("{ref}_index/annotation.gtf.gz", ref=MAP_TO)
+                  fasta = MAP_TO + "_index/reference.fa.gz",
+                  gff = MAP_TO + "_index/annotation.gtf.gz"
                shell:
                   "cp {input.fasta} {output.cp_fasta}"
                   "cp {input.gff} {output.cp_gff}"
 	rule build_star_index:
                 input:
-                  unzip_fasta = expand("{output}/{ref}_tmp/reference.fa",output=OUTPUT_DIR,ref=MAP_TO),
-                  unzip_gff = expand("{output}/{ref}_tmp/annotation.gtf",output=OUTPUT_DIR,ref=MAP_TO)
+                  unzip_fasta = OUTPUT_DIR + MAP_TO + "_tmp/reference.fa",
+                  unzip_gff = OUTPUT_DIR + MAP_TO + "_tmp/annotation.gtf"
                 output:
-                  star_sa = expand("{ref}_index/star/SA",ref=MAP_TO)
+                  star_sa = MAP_TO + "_index/star/SA"
                 params:
-                  star = expand("{ref}_index/star",ref=MAP_TO)
+                  star = MAP_TO + "_index/star"
                 threads: MAX_THREADS
                 log: 
-                  log_file = expand(OUTPUT_DIR + "/LOGS/{ref}_index/star/{ref}.log",ref=MAP_TO)
+                  log_file = OUTPUT_DIR + "/LOGS/" + MAP_TO + "_index/star/" + MAP_TO + ".log"
                 shell:
                    "STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.star} --genomeFastaFiles {input.unzip_fasta} --genomeSAindexNbases 14 --sjdbGTFfile {input.unzip_gff} > {log.log_file} 2>&1"
 
 	rule build_minimap2_index: 
                 input: 
-                  expand("{output}/{ref}_tmp/reference.fa",output=OUTPUT_DIR,ref=MAP_TO)
+                  OUTPUT_DIR + MAP_TO + "_tmp/reference.fa"
                 output: 
-                  expand("{ref}_index/minimap2/{ref}.mmi",ref=MAP_TO)
+                  OUTPUT_DIR + "_index/minimap2/" + MAP_TO + ".mmi"
                 threads: MAX_THREADS
                 log : 
-                  log_file = expand(OUTPUT_DIR + "/LOGS/{ref}_index/minimap2/{ref}.log",ref=MAP_TO)
+                  log_file = OUTPUT_DIR + "/LOGS/" + MAP_TO + "_index/minimap2/" + MAP_TO + ".log"
                 params: PRESET
                 shell:
                    "minimap2 -x {params} -k 14 -d {output} {input} > {log.log_file} 2>&1 "
@@ -113,15 +113,15 @@ if REFERENCE_REQUIRED:
        input:
            fasta = REFERENCE
        output:
-           cp_fasta = expand(OUTPUT_DIR + "/{ref}_tmp/reference.fa.gz",ref=MAP_TO)
+           cp_fasta = OUTPUT_DIR + "/" + MAP_TO + "_tmp/reference.fa.gz"
        shell:
            "cp {input.fasta} {output.cp_fasta} ;"
 
    rule gunzip_reference:
        input:
-           fasta = OUTPUT_DIR + "/{ref}_tmp/reference.fa.gz",
+           fasta = OUTPUT_DIR + "/" + MAP_TO + "_tmp/reference.fa.gz",
        output:
-           unzip_fasta = OUTPUT_DIR + "/{ref}_tmp/reference.fa"
+           unzip_fasta = OUTPUT_DIR + "/" + MAP_TO + "_tmp/reference.fa"
        shell:
            "gunzip -c {input.fasta} > {output.unzip_fasta} ;"
 
@@ -132,16 +132,16 @@ rule copy_annotation:
     input: 
        gff = ANNOTATION
     output: 
-       cp_gff = expand(OUTPUT_DIR + "/{ref}_tmp/annotation.gtf.gz",ref=MAP_TO)
+       cp_gff = OUTPUT_DIR + "/" + MAP_TO + "_tmp/annotation.gtf.gz"
     shell: 
        "cp {input.gff} {output.cp_gff}"
 
 
 rule gunzip_annotation: 
     input: 
-       gff = OUTPUT_DIR + "/{ref}_tmp/annotation.gtf.gz"
+       gff = OUTPUT_DIR + "/" + MAP_TO + "_tmp/annotation.gtf.gz"
     output: 
-       unzip_gff = OUTPUT_DIR + "/{ref}_tmp/annotation.gtf"
+       unzip_gff = OUTPUT_DIR + "/" + MAP_TO + "_tmp/annotation.gtf"
     shell: 
        "gunzip -c {input.gff} > {output.unzip_gff}"
 
@@ -195,20 +195,20 @@ rule split_query:
 if MODE == "index":
 	rule primary_alignment:
          input:
-            star_sa = "{ref}_index/star/SA",
+            star_sa = MAP_TO + "_index/star/SA",
             query_fasta = OUTPUT_DIR + "/query_lt_200.fa"
          params:
-            star_index = "{ref}_index/star",
-            out_path = OUTPUT_DIR + "/STAR_{ref}/",
+            star_index = MAP_TO + "_index/star",
+            out_path = OUTPUT_DIR + "/STAR_" + MAP_TO + "/",
             mode = MODE
          threads: MAX_THREADS
          output:
-            chimeric = OUTPUT_DIR + "/STAR_{ref}/Chimeric.out.junction",
-            bam = OUTPUT_DIR + "/STAR_{ref}/Aligned.out.sam",
-            unmapped = OUTPUT_DIR + "/STAR_{ref}/Unmapped.txt",
-            chim_tags = OUTPUT_DIR + "/STAR_{ref}/Chim_tags.txt"
+            chimeric = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Chimeric.out.junction",
+            bam = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Aligned.out.sam",
+            unmapped = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Unmapped.txt",
+            chim_tags = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Chim_tags.txt"
          log :
-            log_file = OUTPUT_DIR + "/LOGS/STARalignment_{ref}.log"
+            log_file = OUTPUT_DIR + "/LOGS/STARalignment_" + MAP_TO + ".log"
          shell:           
             """
             STAR --genomeDir {params.star_index} --runThreadN {threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx  --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5 > {log.log_file} 2>&1 || true
@@ -219,15 +219,15 @@ if MODE == "index":
 	rule minimap2_alignement: 
          input: 
             query_fasta = OUTPUT_DIR + "/query_gt_200.fa",
-            minimap2_index = "{ref}_index/minimap2/{ref}.mmi"
+            minimap2_index = MAP_TO + "_index/minimap2/" + MAP_TO + ".mmi"
          output: 
-            aln = OUTPUT_DIR + "/Minimap2_{ref}/Alignement_minimap2.sam"
+            aln = OUTPUT_DIR + "/Minimap2_" + MAP_TO + "/Alignement_minimap2.sam"
          threads: MAX_THREADS
          params : 
             preset = PRESET,
             mode = MODE
          log:
-            log_file = OUTPUT_DIR + "/LOGS/runMinimap2alignment_{ref}.log"
+            log_file = OUTPUT_DIR + "/LOGS/runMinimap2alignment_" + MAP_TO + ".log"
          shell:     
             """  
              minimap2 -ax {params.preset} --MD -k 14 --splice --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} || true
@@ -240,16 +240,16 @@ if MODE == "table":
             star_index = INDEX_STAR,
             query_fasta = OUTPUT_DIR + "/query_lt_200.fa"
          params:
-            out_path = OUTPUT_DIR + "/STAR_{ref}/",
+            out_path = OUTPUT_DIR + "/STAR_" + MAP_TO + "/",
             mode = MODE
          threads: MAX_THREADS
          output:
-            chimeric = OUTPUT_DIR + "/STAR_{ref}/Chimeric.out.junction",
-            bam = OUTPUT_DIR + "/STAR_{ref}/Aligned.out.sam",
-            unmapped = OUTPUT_DIR + "/STAR_{ref}/Unmapped.txt",
-            chim_tags = OUTPUT_DIR + "/STAR_{ref}/Chim_tags.txt"
+            chimeric = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Chimeric.out.junction",
+            bam = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Aligned.out.sam",
+            unmapped = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Unmapped.txt",
+            chim_tags = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Chim_tags.txt"
          log :
-            log_file = OUTPUT_DIR + "/LOGS/STARalignment_{ref}.log"
+            log_file = OUTPUT_DIR + "/LOGS/STARalignment_" + MAP_TO + ".log"
          shell:
             """           
             STAR --genomeDir {input.star_index} --runThreadN {threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx  --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5  || true
@@ -262,54 +262,26 @@ if MODE == "table":
             query_fasta = OUTPUT_DIR + "/query_gt_200.fa",
             minimap2_index = INDEX_MINIMAP2
          output: 
-            aln = OUTPUT_DIR + "/Minimap2_{ref}/Alignement_minimap2.sam"
+            aln = OUTPUT_DIR + "/Minimap2_" + MAP_TO + "/Alignement_minimap2.sam"
          threads: MAX_THREADS
          params : 
             preset = PRESET,
             mode = MODE
          log:
-            log_file = OUTPUT_DIR + "/LOGS/runMinimap2alignment_{ref}.log"
+            log_file = OUTPUT_DIR + "/LOGS/runMinimap2alignment_" + MAP_TO + ".log"
          shell:     
             """  
              minimap2 -ax {params.preset} --MD -k 14 --splice --sam-hit-only {input.minimap2_index} {input.query_fasta} > {output.aln} 2>> {log.log_file} || true
            """
 
 
-
-
-
-if len(INDEX_STAR) > 1:
-    for i in range(len(MAP_TO)-1):
-        rule: #secondary_aligmnments
-            input:
-                star_sa = INDEX[i+1] + "/star/SA",
-                query_fasta = OUTPUT_DIR + "/STAR_" + MAP_TO[i] +"/Unmapped.txt"
-            params:
-                star_index = INDEX[i+1] + "/star",
-                out_path = OUTPUT_DIR + "/STAR_" + MAP_TO[i+1] +"/",
-                threads = MAX_THREADS
-            threads: MAX_THREADS
-            output:
-                chimeric = OUTPUT_DIR + "/STAR_" + MAP_TO[i+1] + "/Chimeric.out.junction",
-                bam = OUTPUT_DIR + "/STAR_" + MAP_TO[i+1] +"/Aligned.out.sam",
-                unmapped = OUTPUT_DIR + "/STAR_" + MAP_TO[i+1] +"/Unmapped.txt",
-                chim_tags = OUTPUT_DIR + "/STAR_" + MAP_TO[i+1] + "/Chim_tags.txt"
-            log :
-                OUTPUT_DIR + "/LOGS/runSTARalignment"+ MAP_TO[i+1] +".log"
-            shell:
-                """
-                STAR --genomeDir {params.star_index} --runThreadN {params.threads} --readFilesIn {input.query_fasta} --outFileNamePrefix {params.out_path} --outSAMattributes NH NM nM HI AS --outFilterMultimapNmax 100 --winAnchorMultimapNmax 200 --outReadsUnmapped Fastx --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMismatchNmax 2 --alignIntronMax 100000 --alignSJoverhangMin 10 --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --chimSegmentReadGapMax 3 --alignSJstitchMismatchNmax 5 -1 5 5 > {log.log_file} 2>&1 || true
-                awk '{{print \">\"$10}}' {params.out_path}Chimeric.out.junction > {output.chim_tags} || true
-                set +o pipefail; grep -n -A1 -f {output.chim_tags} {params.out_path}Unmapped.out.mate1 | sed -n 's/^\\([0-9]\\{{1,\\}}\\).*/\\1d/p' | sed -f - {params.out_path}Unmapped.out.mate1 > {output.unmapped} || true
-                """
-
 rule remove_STAR_duplicates:
     input:
-        bam = OUTPUT_DIR + "/STAR_" + MAP_TO[0] + "/Aligned.out.sam"
+        bam = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Aligned.out.sam"
     output:
-        bam_fixed = OUTPUT_DIR + "/STAR_" + MAP_TO[0] + "/Aligned-fixed.out.sam",
-        dedup = OUTPUT_DIR + "/STAR_" + MAP_TO[0] + "/Aligned.out.sam.remove_dedup",
-        count_by_query = OUTPUT_DIR + "/STAR_" + MAP_TO[0] + "/count_by_query.txt"
+        bam_fixed = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Aligned-fixed.out.sam",
+        dedup = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Aligned.out.sam.remove_dedup",
+        count_by_query = OUTPUT_DIR + "/STAR_" + MAP_TO + "/count_by_query.txt"
     log :
         OUTPUT_DIR + "/LOGS/remove_STAR_duplicates.log"
     shell:        
@@ -319,23 +291,23 @@ rule remove_STAR_duplicates:
 
 rule add_hit_tag:
      input: 
-        aln = OUTPUT_DIR + "/Minimap2_{ref}/Alignement_minimap2.sam", 
+        aln = OUTPUT_DIR + "/Minimap2_" + MAP_TO  + "/Alignement_minimap2.sam", 
      output: 
-        aln_hit = OUTPUT_DIR + "/Minimap2_{ref}/Alignement_minimap2_add_hit.sam",
+        aln_hit = OUTPUT_DIR + "/Minimap2_" + MAP_TO + "/Alignement_minimap2_add_hit.sam",
      shell: 
         " python script/add_hits.py {input} {output}"
 
 rule add_bam_data:
     input:
-        bam_fixed = OUTPUT_DIR + "/STAR_" + MAP_TO[0] + "/Aligned-fixed.out.sam",
-        sam_minimap2 = OUTPUT_DIR + "/Minimap2_" + MAP_TO[0] + "/Alignement_minimap2_add_hit.sam"
+        bam_fixed = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Aligned-fixed.out.sam",
+        sam_minimap2 = OUTPUT_DIR + "/Minimap2_" + MAP_TO + "/Alignement_minimap2_add_hit.sam"
     params:
         strand = STRAND,
         id_col = UNIQUE_ID_COL,
-        reference = MAP_TO[0]
+        reference = MAP_TO
     output:
-        bam_annot = temp(OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO[0] + ".tsv"),
-        minimap2_annot = temp(OUTPUT_DIR + "/bam_annotation_minimap2_" + MAP_TO[0] + ".tsv")
+        bam_annot = temp(OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO + ".tsv"),
+        minimap2_annot = temp(OUTPUT_DIR + "/bam_annotation_minimap2_" + MAP_TO + ".tsv")
     run:
         try:
             aBD.addBAMAnnotation(input.bam_fixed, output.bam_annot, params.strand, params.id_col, params.reference)
@@ -349,12 +321,12 @@ rule add_bam_data:
 
 rule add_gff_data:
     input:
-        unzip_gff = OUTPUT_DIR + "/" + MAP_TO[0] + "_tmp/annotation.gtf",
-        bam_annot = OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO[0] + ".tsv",
-        minimap2_annot = OUTPUT_DIR + "/bam_annotation_minimap2_" + MAP_TO[0] + ".tsv"
+        unzip_gff = OUTPUT_DIR + "/" + MAP_TO + "_tmp/annotation.gtf",
+        bam_annot = OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO + ".tsv",
+        minimap2_annot = OUTPUT_DIR + "/bam_annotation_minimap2_" + MAP_TO + ".tsv"
     output:
-        gff_annot = temp(OUTPUT_DIR + "/gff_annotation_star_" + MAP_TO[0] + ".tsv"),
-        gff_minimap2_annot = temp(OUTPUT_DIR + "/gff_annotation_minimap2_" + MAP_TO[0] + ".tsv")
+        gff_annot = temp(OUTPUT_DIR + "/gff_annotation_star_" + MAP_TO + ".tsv"),
+        gff_minimap2_annot = temp(OUTPUT_DIR + "/gff_annotation_minimap2_" + MAP_TO + ".tsv")
     params:
         strand = STRAND
     run:
@@ -388,10 +360,10 @@ rule add_gff_data:
 
 rule create_chimeric_file:
     input:
-        sam = OUTPUT_DIR + "/Minimap2_" + MAP_TO[0] +  "/Alignement_minimap2_add_hit.sam"
+        sam = OUTPUT_DIR + "/Minimap2_" + MAP_TO +  "/Alignement_minimap2_add_hit.sam"
     output: 
-        chimeric_tmp = expand(OUTPUT_DIR + "/Minimap2_" + MAP_TO[0] + "/Chimerics_minimap2_tmp.out"),
-        chimeric = OUTPUT_DIR + "/Minimap2_" + MAP_TO[0] + "/Chimerics_minimap2.out" 
+        chimeric_tmp = expand(OUTPUT_DIR + "/Minimap2_" + MAP_TO + "/Chimerics_minimap2_tmp.out"),
+        chimeric = OUTPUT_DIR + "/Minimap2_" + MAP_TO + "/Chimerics_minimap2.out" 
     shell: 
         "grep 'SA:' {input} > {output.chimeric_tmp} || true ;"
         "python script/add_chimeric.py {output.chimeric_tmp} | sed '1~2d' > {output.chimeric} || true "
@@ -399,14 +371,14 @@ rule create_chimeric_file:
 
 rule add_chimeric_data:
     input:
-        chim_file = OUTPUT_DIR + "/STAR_" + MAP_TO[0] + "/Chimeric.out.junction",
-        chimeric = OUTPUT_DIR + "/Minimap2_" + MAP_TO[0] + "/Chimerics_minimap2.out"
+        chim_file = OUTPUT_DIR + "/STAR_" + MAP_TO + "/Chimeric.out.junction",
+        chimeric = OUTPUT_DIR + "/Minimap2_" + MAP_TO + "/Chimerics_minimap2.out"
     output:
-        chim_annot = temp(OUTPUT_DIR + "/chim_annotation_star_" + MAP_TO[0] + ".tsv"),
-        chim_annot_minimap2 = temp(OUTPUT_DIR + "/chim_annotation_minimap2_" + MAP_TO[0] + ".tsv")
+        chim_annot = temp(OUTPUT_DIR + "/chim_annotation_star_" + MAP_TO + ".tsv"),
+        chim_annot_minimap2 = temp(OUTPUT_DIR + "/chim_annotation_minimap2_" + MAP_TO + ".tsv")
     params:
         id_col = UNIQUE_ID_COL,
-        reference = MAP_TO[0]
+        reference = MAP_TO
     run:
         try:
             aCD.extractChimFromFile(input.chim_file, output.chim_annot, params.id_col, params.reference)
@@ -452,7 +424,7 @@ if CONTAMINATION:
             id_col = UNIQUE_ID_COL
         resources:
             mem_mb = 8000
-        threads: 1
+        threads: 4
         log: 
             log = OUTPUT_DIR + "/LOGS/runBLAST_Contamination.log"
         shell: 
@@ -460,21 +432,21 @@ if CONTAMINATION:
            set +o pipefail;
            # Blast query on fungi, viruses, and bacteria (combined databases)
            echo -e "{params.id_col}\t{params.cont}" > {output.cont_hits} ;
-           blastn -query {input.query_fasta} -db {input.db}/db_bacteria_virus_fungi -max_hsps 1 -max_target_seqs 1 -evalue 1e-3 -outfmt "6 qseqid salltitles" >> {output.cont_hits} 2>> {log.log}
+           blastn -query {input.query_fasta} -db {input.db}/db_bacteria_virus_fungi -max_hsps 1 -max_target_seqs 1 -evalue 1e-3 -outfmt "6 qseqid salltitles" -num_threads {threads} >> {output.cont_hits} 2>> {log.log}
            """
 
 rule merge_files:
      input: 
-         bam_star= OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO[0] + ".tsv",
-         bam_minimap2=OUTPUT_DIR + "/bam_annotation_minimap2_" + MAP_TO[0] + ".tsv",
-         gff_star= OUTPUT_DIR + "/gff_annotation_star_" + MAP_TO[0] + ".tsv",
-         gff_minimap2=OUTPUT_DIR + "/gff_annotation_minimap2_" + MAP_TO[0] + ".tsv",
-         chim_star= OUTPUT_DIR + "/chim_annotation_star_" + MAP_TO[0] + ".tsv",
-         chim_minimap2=OUTPUT_DIR + "/chim_annotation_minimap2_" + MAP_TO[0] + ".tsv"
+         bam_star= OUTPUT_DIR + "/bam_annotation_star_" + MAP_TO + ".tsv",
+         bam_minimap2=OUTPUT_DIR + "/bam_annotation_minimap2_" + MAP_TO + ".tsv",
+         gff_star= OUTPUT_DIR + "/gff_annotation_star_" + MAP_TO + ".tsv",
+         gff_minimap2=OUTPUT_DIR + "/gff_annotation_minimap2_" + MAP_TO + ".tsv",
+         chim_star= OUTPUT_DIR + "/chim_annotation_star_" + MAP_TO + ".tsv",
+         chim_minimap2=OUTPUT_DIR + "/chim_annotation_minimap2_" + MAP_TO + ".tsv"
      output: 
-         bam_merged =  temp(OUTPUT_DIR + "/bam_annotation_" + MAP_TO[0] + ".tsv"),
-         gff_merged =  temp(OUTPUT_DIR + "/gff_annotation_" + MAP_TO[0] + ".tsv"), 
-         chim_merged = temp(OUTPUT_DIR + "/chim_annotation_" + MAP_TO[0] + ".tsv"),
+         bam_merged =  temp(OUTPUT_DIR + "/bam_annotation_" + MAP_TO + ".tsv"),
+         gff_merged =  temp(OUTPUT_DIR + "/gff_annotation_" + MAP_TO + ".tsv"), 
+         chim_merged = temp(OUTPUT_DIR + "/chim_annotation_" + MAP_TO + ".tsv"),
      shell: 
          "cat {input.bam_star} > {output.bam_merged} || true ;"
          "tail -n +2 {input.bam_minimap2} >> {output.bam_merged} || true ;"  
@@ -490,9 +462,9 @@ rule merge_files:
 
 rule merge_annot:
     input:
-        bam_annot = expand(OUTPUT_DIR + "/bam_annotation_{ref}.tsv", ref=MAP_TO),
-        gff_annot = expand( OUTPUT_DIR + "/gff_annotation_{ref}.tsv", ref=MAP_TO),
-        chim_annot = expand( OUTPUT_DIR + "/chim_annotation_{ref}.tsv" ,ref=MAP_TO),
+        bam_annot = OUTPUT_DIR + "/bam_annotation_" + MAP_TO + ".tsv",
+        gff_annot = OUTPUT_DIR + "/gff_annotation_" + MAP_TO + ".tsv",
+        chim_annot = OUTPUT_DIR + "/chim_annotation_" + MAP_TO + ".tsv" ,
         blast_annot = expand( OUTPUT_DIR + "/blast/{ref}.tsv", ref=SUPP_MAP_TO) if SUPP_MAP_TO else [],
         base_file = SEQUENCE_FILE,
         cont_hits = [OUTPUT_DIR + "/contamination/contaminations_hits.tsv"] if config.get("contamination", False) else []
@@ -507,10 +479,10 @@ rule merge_annot:
         keep_col = KEEP_COLUMN
     run:
         shell( "rm -f {output.bam_all} {output.gff_all}" )
-        for i in range(len(MAP_TO)):
-            shell(r'cat {bam_annot} >> {bam_all}'.format(bam_annot=input.bam_annot[i],bam_all=output.bam_all ))
-            shell("cat {gff_annot} >> {gff_all}".format(gff_annot=input.gff_annot[i],gff_all=output.gff_all ))
-            shell("cat {chim_annot} >> {chim_all}".format(chim_annot=input.chim_annot[i],chim_all=output.chim_all ))
+        
+        shell(r'cat {input.bam_annot} >> {output.bam_all}')
+        shell("cat {input.gff_annot} >> {output.gff_all}")
+        shell("cat {input.chim_annot} >> {output.chim_all}")
         shell(r"paste -d$'\t' {output.bam_all} {output.gff_all} > {output.bam_and_gff}")
         contamination_hits = input.cont_hits if isinstance(input.cont_hits, list) else []
 
@@ -524,5 +496,4 @@ rule merge_annot:
              params.keep_col if isinstance(params.keep_col, list) else [params.keep_col],
              output.merged_annot
           )
-
 
