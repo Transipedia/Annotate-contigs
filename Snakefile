@@ -46,8 +46,8 @@ INDEX_MINIMAP2 = config['minimap2_index']
 MODE = config['mode']
 MAX_THREADS = config['threads'] if 'supp_map_to' in config else 4
 TMP_FOLDER = OUTPUT_DIR + "/tmp"
-SUPP_MAP_TO = config['supp_map_to'] if 'supp_map_to' in config else []
-SUPP_MAP_TO_FASTA = config['supp_map_to_fasta'] if 'supp_map_to_fasta' in config else []
+SUPP_MAP_TO = [ref for ref in config.get('supp_map_to', []) if ref.strip()]
+SUPP_MAP_TO_FASTA = [ref for ref in config.get('supp_map_to_fasta', []) if ref.strip()]
 blast_dict = {}
 for i in range(len(SUPP_MAP_TO)):
     blast_dict[SUPP_MAP_TO[i]] = SUPP_MAP_TO_FASTA[i]

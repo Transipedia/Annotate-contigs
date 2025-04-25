@@ -112,7 +112,7 @@ Only the "exon" features of the GTF file will be used. In order for the program 
 
 - **supp_map_to**: (Default:[""]). List of supplementary reference names you want to map your sequences to, with no further information (using blast).
 
-- **supp_map_to_fasta**: For each reference in `supp_map_to`, path to its fasta sequence. An exemple of a typical fasta file you could use (Human repeats from Dfam) is available in data/.
+- **supp_map_to_fasta**:(Defaults:[""]). For each reference in `supp_map_to`, path to its fasta sequence. An exemple of a typical fasta file you could use (Human repeats from Dfam) is available in data/.
 
 - **contamination** : (Default: False). Toggle contaminant detection.
 
@@ -134,6 +134,7 @@ If you have two supplementary references, e.g., human repeats and viral elements
 - "supp_map_to": ["HumanRepeats", "ViralElements"],
 - "supp_map_to_fasta": ["/home/Documents/Annotate-contigs/data/human_repeat_ref.fasta","/home/Documents/Annotate-contigs/data/viral_elements_ref.fasta" ]
 
+N.B : If "supp_map_to" and "supp_map_to_fasta" are set to [""], the pipeline will skip the supplementary alignment step, and the corresponding column will be missing from the final output table. 
 
 ## Output file
 
