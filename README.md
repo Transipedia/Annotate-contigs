@@ -202,7 +202,7 @@ and also downloaded and decompressed the BLAST database.
   "input_file": "Annotate-contigs/data/input_file.tsv",
   "sequence_col": "contig",
   "id_col": "tag",
-  "map_to" : ["human"],
+  "map_to" : "human",
   "supp_map_to" : ["repeats"],
   "preset" : "splice",
   "supp_map_to_fasta" : ["Annotate-contigs/data/human_repeat_ref.fasta"],
